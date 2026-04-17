@@ -10,12 +10,16 @@ const path = require('path');
 const schemaPath = path.join(__dirname, 'schema.sql');
 const dbPath = path.join(__dirname, 'database.db')
 
-const schema = fs.readFileSync('./db/schema.sql', 'utf8');
+const schema = fs.readFileSync(schemaPath, 'utf8');
 
 console.log("3: schema loaded");
 
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
+    console.error('error connecting to database');
+  }
+  else
+  {
     console.log('connected to sqlite database');
     // foreign keys must be enabled per connection
     db.run('PRAGMA foreign_keys = ON')
