@@ -14,6 +14,8 @@ app.get('/', (req, res) => {
   res.send('API running');
 });
 
+// routes will go here
+
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
