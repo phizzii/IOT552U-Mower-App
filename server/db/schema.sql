@@ -2,7 +2,7 @@
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS Customer (
-    customer_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_id INTEGER PRIMARY KEY, --consider not using auto increment
     first_name TEXT,
     last_name TEXT,
     phone_number TEXT,
@@ -13,12 +13,12 @@ CREATE TABLE IF NOT EXISTS Customer (
 );
 
 CREATE TABLE Machine_Type (
-    machine_type_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    machine_type_id INTEGER PRIMARY KEY,
     type_name TEXT NOT NULL
 );
 
 CREATE TABLE Service (
-    service_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    service_id INTEGER PRIMARY KEY,
     machine_type_id INTEGER,
     service_description TEXT,
     price REAL,
@@ -26,7 +26,7 @@ CREATE TABLE Service (
 );
 
 CREATE TABLE Part (
-  part_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  part_id INTEGER PRIMARY KEY,
   part_description TEXT,
   supplier_name TEXT,
   supplier_cost REAL,
@@ -34,7 +34,7 @@ CREATE TABLE Part (
 );
 
 CREATE TABLE Machine (
-  machine_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  machine_id INTEGER PRIMARY KEY,
   customer_id INTEGER,
   machine_type_id INTEGER,
   make TEXT,
@@ -46,7 +46,7 @@ CREATE TABLE Machine (
 );
 
 CREATE TABLE Repair_Job (
-  job_no INTEGER PRIMARY KEY AUTOINCREMENT,
+  job_no INTEGER PRIMARY KEY,
   customer_id INTEGER,
   machine_id INTEGER,
   date_logged TEXT,
@@ -62,7 +62,7 @@ CREATE TABLE Repair_Job (
 );
 
 CREATE TABLE Job_Line_Item (
-  line_item_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  line_item_id INTEGER PRIMARY KEY,
   job_id INTEGER,
   service_id INTEGER,
   description TEXT,
@@ -74,7 +74,7 @@ CREATE TABLE Job_Line_Item (
 );
 
 CREATE TABLE Job_Part (
-  job_part_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  job_part_id INTEGER PRIMARY KEY,
   job_no INTEGER,
   part_id INTEGER,
   quantity INTEGER,
@@ -86,7 +86,7 @@ CREATE TABLE Job_Part (
 );
 
 CREATE TABLE Delivery (
-  delivery_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  delivery_id INTEGER PRIMARY KEY,
   invoice_no INTEGER,
   fuel_price_per_litre REAL,
   driver_cost_per_hour REAL,
@@ -96,7 +96,7 @@ CREATE TABLE Delivery (
 );
 
 CREATE TABLE Sale_Item (
-  sale_item_no INTEGER PRIMARY KEY AUTOINCREMENT,
+  sale_item_no INTEGER PRIMARY KEY,
   customer_id INTEGER,
   make TEXT,
   model TEXT,
@@ -109,7 +109,7 @@ CREATE TABLE Sale_Item (
 );
 
 CREATE TABLE Invoice (
-  invoice_no INTEGER PRIMARY KEY AUTOINCREMENT,
+  invoice_no INTEGER PRIMARY KEY,
   customer_id INTEGER,
   job_no INTEGER,
   sale_item_no INTEGER,
