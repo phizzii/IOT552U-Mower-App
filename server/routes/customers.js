@@ -1,143 +1,142 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db/db');
+const {
+  all,
+  asyncHandler,
+  getOne,
+  normalizeText,
+  run,
+  sendValidationErrors,
+  validateIdParam,
+} = require('../utils/routeHelpers');
 
-router.get('/', (req, res) => {
-  const sql = 'SELECT * FROM Customer ORDER BY customer_id';
-
-  db.all(sql, [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+router.get(
+  '/',
+  asyncHandler(async (req, res) => {
+    const sql = 'SELECT * FROM Customer ORDER BY customer_id';
+    const rows = await all(db, sql);
 
     return res.json(rows);
-  });
-});
+  })
+);
 
-router.get('/:id', (req, res) => {
-  const sql = 'SELECT * FROM Customer WHERE customer_id = ?';
+router.get(
+  '/:id',
+  asyncHandler(async (req, res) => {
+    const { errors, id } = validateIdParam(req.params.id, 'customer_id');
 
-  db.get(sql, [req.params.id], (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+    if (sendValidationErrors(res, errors)) {
+      return;
     }
+
+    const sql = 'SELECT * FROM Customer WHERE customer_id = ?';
+    const row = await getOne(db, sql, [id]);
 
     if (!row) {
       return res.status(404).json({ error: 'Customer not found' });
     }
 
     return res.json(row);
-  });
-});
+  })
+);
 
-router.post('/', (req, res) => {
-  const {
-    first_name,
-    last_name,
-    phone_number,
-    address_line_1,
-    address_line_2,
-    address_line_3,
-    postcode,
-  } = req.body;
+router.post(
+  '/',
+  asyncHandler(async (req, res) => {
+    const sql = `
+      INSERT INTO Customer (
+        first_name,
+        last_name,
+        phone_number,
+        address_line_1,
+        address_line_2,
+        address_line_3,
+        postcode
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
 
-  const sql = `
-    INSERT INTO Customer (
-      first_name,
-      last_name,
-      phone_number,
-      address_line_1,
-      address_line_2,
-      address_line_3,
-      postcode
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `;
+    const params = [
+      normalizeText(req.body.first_name),
+      normalizeText(req.body.last_name),
+      normalizeText(req.body.phone_number),
+      normalizeText(req.body.address_line_1),
+      normalizeText(req.body.address_line_2),
+      normalizeText(req.body.address_line_3),
+      normalizeText(req.body.postcode),
+    ];
 
-  const params = [
-    first_name,
-    last_name,
-    phone_number,
-    address_line_1,
-    address_line_2,
-    address_line_3,
-    postcode,
-  ];
-
-  db.run(sql, params, function onInsert(err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+    const result = await run(db, sql, params);
 
     return res.status(201).json({
       message: 'Customer created successfully',
-      customer_id: this.lastID,
+      customer_id: result.lastID,
     });
-  });
-});
+  })
+);
 
-router.put('/:id', (req, res) => {
-  const {
-    first_name,
-    last_name,
-    phone_number,
-    address_line_1,
-    address_line_2,
-    address_line_3,
-    postcode,
-  } = req.body;
+router.put(
+  '/:id',
+  asyncHandler(async (req, res) => {
+    const { errors, id } = validateIdParam(req.params.id, 'customer_id');
 
-  const sql = `
-    UPDATE Customer
-    SET
-      first_name = ?,
-      last_name = ?,
-      phone_number = ?,
-      address_line_1 = ?,
-      address_line_2 = ?,
-      address_line_3 = ?,
-      postcode = ?
-    WHERE customer_id = ?
-  `;
-
-  const params = [
-    first_name,
-    last_name,
-    phone_number,
-    address_line_1,
-    address_line_2,
-    address_line_3,
-    postcode,
-    req.params.id,
-  ];
-
-  db.run(sql, params, function onUpdate(err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+    if (sendValidationErrors(res, errors)) {
+      return;
     }
 
-    if (this.changes === 0) {
+    const sql = `
+      UPDATE Customer
+      SET
+        first_name = ?,
+        last_name = ?,
+        phone_number = ?,
+        address_line_1 = ?,
+        address_line_2 = ?,
+        address_line_3 = ?,
+        postcode = ?
+      WHERE customer_id = ?
+    `;
+
+    const params = [
+      normalizeText(req.body.first_name),
+      normalizeText(req.body.last_name),
+      normalizeText(req.body.phone_number),
+      normalizeText(req.body.address_line_1),
+      normalizeText(req.body.address_line_2),
+      normalizeText(req.body.address_line_3),
+      normalizeText(req.body.postcode),
+      id,
+    ];
+
+    const result = await run(db, sql, params);
+
+    if (result.changes === 0) {
       return res.status(404).json({ error: 'Customer not found' });
     }
 
     return res.json({ message: 'Customer updated successfully' });
-  });
-});
+  })
+);
 
-router.delete('/:id', (req, res) => {
-  const sql = 'DELETE FROM Customer WHERE customer_id = ?';
+router.delete(
+  '/:id',
+  asyncHandler(async (req, res) => {
+    const { errors, id } = validateIdParam(req.params.id, 'customer_id');
 
-  db.run(sql, [req.params.id], function onDelete(err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+    if (sendValidationErrors(res, errors)) {
+      return;
     }
 
-    if (this.changes === 0) {
+    const sql = 'DELETE FROM Customer WHERE customer_id = ?';
+    const result = await run(db, sql, [id]);
+
+    if (result.changes === 0) {
       return res.status(404).json({ error: 'Customer not found' });
     }
 
     return res.json({ message: 'Customer deleted successfully' });
-  });
-});
+  })
+);
 
 module.exports = router;
