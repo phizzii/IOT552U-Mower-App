@@ -1,6 +1,4 @@
--- adding this because otherwise no foreign keys and they have to be force enabled
-PRAGMA foreign_keys = ON;
-
+-- schema for database
 CREATE TABLE IF NOT EXISTS Customer (
     customer_id INTEGER PRIMARY KEY, --consider not using auto increment
     first_name TEXT,
@@ -61,7 +59,7 @@ CREATE TABLE Repair_Job (
   FOREIGN KEY (machine_id) REFERENCES Machine(machine_id)
 );
 
-CREATE TABLE Job_Line_Item (
+CREATE TABLE Job_Line_Item ( --consider aligning foreign key naming and constraints for job line item with the rest of the schema
   line_item_id INTEGER PRIMARY KEY,
   job_id INTEGER,
   service_id INTEGER,
