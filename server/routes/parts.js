@@ -1,125 +1,151 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db/db');
+const {
+  all,
+  asyncHandler,
+  getOne,
+  normalizeText,
+  parseNumber,
+  run,
+  sendValidationErrors,
+  validateIdParam,
+} = require('../utils/routeHelpers');
 
-router.get('/', (req, res) => {
-  const sql = 'SELECT * FROM Part ORDER BY part_id';
+function getPartPayload(body) {
+  const errors = [];
 
-  db.all(sql, [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+  return {
+    errors,
+    part_description: normalizeText(body.part_description),
+    retail_price: parseNumber(body.retail_price, 'retail_price', errors, {
+      min: 0,
+    }),
+    supplier_cost: parseNumber(body.supplier_cost, 'supplier_cost', errors, {
+      min: 0,
+    }),
+    supplier_name: normalizeText(body.supplier_name),
+  };
+}
+
+router.get(
+  '/',
+  asyncHandler(async (req, res) => {
+    const sql = 'SELECT * FROM Part ORDER BY part_id';
+    const rows = await all(db, sql);
 
     return res.json(rows);
-  });
-});
+  })
+);
 
-router.get('/:id', (req, res) => {
-  const sql = 'SELECT * FROM Part WHERE part_id = ?';
+router.get(
+  '/:id',
+  asyncHandler(async (req, res) => {
+    const { errors, id } = validateIdParam(req.params.id, 'part_id');
 
-  db.get(sql, [req.params.id], (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+    if (sendValidationErrors(res, errors)) {
+      return;
     }
+
+    const sql = 'SELECT * FROM Part WHERE part_id = ?';
+    const row = await getOne(db, sql, [id]);
 
     if (!row) {
       return res.status(404).json({ error: 'Part not found' });
     }
 
     return res.json(row);
-  });
-});
+  })
+);
 
-router.post('/', (req, res) => {
-  const {
-    part_description,
-    supplier_name,
-    supplier_cost,
-    retail_price,
-  } = req.body;
+router.post(
+  '/',
+  asyncHandler(async (req, res) => {
+    const payload = getPartPayload(req.body);
 
-  const sql = `
-    INSERT INTO Part (
-      part_description,
-      supplier_name,
-      supplier_cost,
-      retail_price
-    )
-    VALUES (?, ?, ?, ?)
-  `;
-
-  const params = [
-    part_description,
-    supplier_name,
-    supplier_cost,
-    retail_price,
-  ];
-
-  db.run(sql, params, function onInsert(err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+    if (sendValidationErrors(res, payload.errors)) {
+      return;
     }
+
+    const sql = `
+      INSERT INTO Part (
+        part_description,
+        supplier_name,
+        supplier_cost,
+        retail_price
+      )
+      VALUES (?, ?, ?, ?)
+    `;
+
+    const result = await run(db, sql, [
+      payload.part_description,
+      payload.supplier_name,
+      payload.supplier_cost,
+      payload.retail_price,
+    ]);
 
     return res.status(201).json({
       message: 'Part created successfully',
-      part_id: this.lastID,
+      part_id: result.lastID,
     });
-  });
-});
+  })
+);
 
-router.put('/:id', (req, res) => {
-  const {
-    part_description,
-    supplier_name,
-    supplier_cost,
-    retail_price,
-  } = req.body;
+router.put(
+  '/:id',
+  asyncHandler(async (req, res) => {
+    const idValidation = validateIdParam(req.params.id, 'part_id');
+    const payload = getPartPayload(req.body);
+    const errors = [...idValidation.errors, ...payload.errors];
 
-  const sql = `
-    UPDATE Part
-    SET
-      part_description = ?,
-      supplier_name = ?,
-      supplier_cost = ?,
-      retail_price = ?
-    WHERE part_id = ?
-  `;
-
-  const params = [
-    part_description,
-    supplier_name,
-    supplier_cost,
-    retail_price,
-    req.params.id,
-  ];
-
-  db.run(sql, params, function onUpdate(err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+    if (sendValidationErrors(res, errors)) {
+      return;
     }
 
-    if (this.changes === 0) {
+    const sql = `
+      UPDATE Part
+      SET
+        part_description = ?,
+        supplier_name = ?,
+        supplier_cost = ?,
+        retail_price = ?
+      WHERE part_id = ?
+    `;
+
+    const result = await run(db, sql, [
+      payload.part_description,
+      payload.supplier_name,
+      payload.supplier_cost,
+      payload.retail_price,
+      idValidation.id,
+    ]);
+
+    if (result.changes === 0) {
       return res.status(404).json({ error: 'Part not found' });
     }
 
     return res.json({ message: 'Part updated successfully' });
-  });
-});
+  })
+);
 
-router.delete('/:id', (req, res) => {
-  const sql = 'DELETE FROM Part WHERE part_id = ?';
+router.delete(
+  '/:id',
+  asyncHandler(async (req, res) => {
+    const { errors, id } = validateIdParam(req.params.id, 'part_id');
 
-  db.run(sql, [req.params.id], function onDelete(err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+    if (sendValidationErrors(res, errors)) {
+      return;
     }
 
-    if (this.changes === 0) {
+    const sql = 'DELETE FROM Part WHERE part_id = ?';
+    const result = await run(db, sql, [id]);
+
+    if (result.changes === 0) {
       return res.status(404).json({ error: 'Part not found' });
     }
 
     return res.json({ message: 'Part deleted successfully' });
-  });
-});
+  })
+);
 
 module.exports = router;

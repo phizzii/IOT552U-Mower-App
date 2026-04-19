@@ -1,163 +1,186 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db/db');
+const {
+  all,
+  asyncHandler,
+  getOne,
+  normalizeText,
+  parseDate,
+  parseInteger,
+  parseNumber,
+  run,
+  sendValidationErrors,
+  validateIdParam,
+} = require('../utils/routeHelpers');
 
-router.get('/', (req, res) => {
-  const sql = `
-    SELECT
-      jp.*,
-      p.part_description
-    FROM Job_Part jp
-    LEFT JOIN Part p ON jp.part_id = p.part_id
-    ORDER BY jp.job_part_id
-  `;
+function getJobPartPayload(body) {
+  const errors = [];
 
-  db.all(sql, [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+  return {
+    bill_date: parseDate(body.bill_date, 'bill_date', errors),
+    bill_no: normalizeText(body.bill_no),
+    charge_price: parseNumber(body.charge_price, 'charge_price', errors, {
+      min: 0,
+    }),
+    errors,
+    job_no: parseInteger(body.job_no, 'job_no', errors, {
+      min: 1,
+      required: true,
+    }),
+    part_id: parseInteger(body.part_id, 'part_id', errors, {
+      min: 1,
+      required: true,
+    }),
+    quantity: parseInteger(body.quantity, 'quantity', errors, {
+      min: 1,
+      required: true,
+    }),
+  };
+}
+
+router.get(
+  '/',
+  asyncHandler(async (req, res) => {
+    const sql = `
+      SELECT
+        jp.*,
+        p.part_description
+      FROM Job_Part jp
+      LEFT JOIN Part p ON jp.part_id = p.part_id
+      ORDER BY jp.job_part_id
+    `;
+
+    const rows = await all(db, sql);
 
     return res.json(rows);
-  });
-});
+  })
+);
 
-router.get('/:id', (req, res) => {
-  const sql = `
-    SELECT
-      jp.*,
-      p.part_description
-    FROM Job_Part jp
-    LEFT JOIN Part p ON jp.part_id = p.part_id
-    WHERE jp.job_part_id = ?
-  `;
+router.get(
+  '/:id',
+  asyncHandler(async (req, res) => {
+    const { errors, id } = validateIdParam(req.params.id, 'job_part_id');
 
-  db.get(sql, [req.params.id], (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+    if (sendValidationErrors(res, errors)) {
+      return;
     }
+
+    const sql = `
+      SELECT
+        jp.*,
+        p.part_description
+      FROM Job_Part jp
+      LEFT JOIN Part p ON jp.part_id = p.part_id
+      WHERE jp.job_part_id = ?
+    `;
+
+    const row = await getOne(db, sql, [id]);
 
     if (!row) {
       return res.status(404).json({ error: 'Job part not found' });
     }
 
     return res.json(row);
-  });
-});
+  })
+);
 
-router.post('/', (req, res) => {
-  const {
-    job_no,
-    part_id,
-    quantity,
-    bill_no,
-    bill_date,
-    charge_price,
-  } = req.body;
+router.post(
+  '/',
+  asyncHandler(async (req, res) => {
+    const payload = getJobPartPayload(req.body);
 
-  if (!job_no || !part_id || quantity === undefined) {
-    return res.status(400).json({
-      error: 'job_no, part_id and quantity are required',
-    });
-  }
-
-  const sql = `
-    INSERT INTO Job_Part (
-      job_no,
-      part_id,
-      quantity,
-      bill_no,
-      bill_date,
-      charge_price
-    )
-    VALUES (?, ?, ?, ?, ?, ?)
-  `;
-
-  const params = [
-    job_no,
-    part_id,
-    quantity,
-    bill_no,
-    bill_date,
-    charge_price,
-  ];
-
-  db.run(sql, params, function onInsert(err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+    if (sendValidationErrors(res, payload.errors)) {
+      return;
     }
+
+    const sql = `
+      INSERT INTO Job_Part (
+        job_no,
+        part_id,
+        quantity,
+        bill_no,
+        bill_date,
+        charge_price
+      )
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    const result = await run(db, sql, [
+      payload.job_no,
+      payload.part_id,
+      payload.quantity,
+      payload.bill_no,
+      payload.bill_date,
+      payload.charge_price,
+    ]);
 
     return res.status(201).json({
+      job_part_id: result.lastID,
       message: 'Job part created successfully',
-      job_part_id: this.lastID,
     });
-  });
-});
+  })
+);
 
-router.put('/:id', (req, res) => {
-  const {
-    job_no,
-    part_id,
-    quantity,
-    bill_no,
-    bill_date,
-    charge_price,
-  } = req.body;
+router.put(
+  '/:id',
+  asyncHandler(async (req, res) => {
+    const idValidation = validateIdParam(req.params.id, 'job_part_id');
+    const payload = getJobPartPayload(req.body);
+    const errors = [...idValidation.errors, ...payload.errors];
 
-  if (!job_no || !part_id || quantity === undefined) {
-    return res.status(400).json({
-      error: 'job_no, part_id and quantity are required',
-    });
-  }
-
-  const sql = `
-    UPDATE Job_Part
-    SET
-      job_no = ?,
-      part_id = ?,
-      quantity = ?,
-      bill_no = ?,
-      bill_date = ?,
-      charge_price = ?
-    WHERE job_part_id = ?
-  `;
-
-  const params = [
-    job_no,
-    part_id,
-    quantity,
-    bill_no,
-    bill_date,
-    charge_price,
-    req.params.id,
-  ];
-
-  db.run(sql, params, function onUpdate(err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+    if (sendValidationErrors(res, errors)) {
+      return;
     }
 
-    if (this.changes === 0) {
+    const sql = `
+      UPDATE Job_Part
+      SET
+        job_no = ?,
+        part_id = ?,
+        quantity = ?,
+        bill_no = ?,
+        bill_date = ?,
+        charge_price = ?
+      WHERE job_part_id = ?
+    `;
+
+    const result = await run(db, sql, [
+      payload.job_no,
+      payload.part_id,
+      payload.quantity,
+      payload.bill_no,
+      payload.bill_date,
+      payload.charge_price,
+      idValidation.id,
+    ]);
+
+    if (result.changes === 0) {
       return res.status(404).json({ error: 'Job part not found' });
     }
 
     return res.json({ message: 'Job part updated successfully' });
-  });
-});
+  })
+);
 
-router.delete('/:id', (req, res) => {
-  const sql = 'DELETE FROM Job_Part WHERE job_part_id = ?';
+router.delete(
+  '/:id',
+  asyncHandler(async (req, res) => {
+    const { errors, id } = validateIdParam(req.params.id, 'job_part_id');
 
-  db.run(sql, [req.params.id], function onDelete(err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+    if (sendValidationErrors(res, errors)) {
+      return;
     }
 
-    if (this.changes === 0) {
+    const sql = 'DELETE FROM Job_Part WHERE job_part_id = ?';
+    const result = await run(db, sql, [id]);
+
+    if (result.changes === 0) {
       return res.status(404).json({ error: 'Job part not found' });
     }
 
     return res.json({ message: 'Job part deleted successfully' });
-  });
-});
+  })
+);
 
 module.exports = router;
