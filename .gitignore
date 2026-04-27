@@ -19,3 +19,4 @@ client/build/
 
 # VS Code settings
 .vscode/
+.claude

@@ -17,6 +17,7 @@ function getRepairJobPayload(body) {
   const errors = [];
 
   return {
+    assigned_mechanic: normalizeText(body.assigned_mechanic),
     contact_method: normalizeText(body.contact_method),
     customer_id: parseInteger(body.customer_id, 'customer_id', errors, {
       min: 1,
@@ -111,11 +112,12 @@ router.post(
         instruction,
         notes,
         status,
+        assigned_mechanic,
         date_finished,
         contact_method,
         date_return
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const result = await run(db, sql, [
@@ -126,6 +128,7 @@ router.post(
       payload.instruction,
       payload.notes,
       payload.status,
+      payload.assigned_mechanic,
       payload.date_finished,
       payload.contact_method,
       payload.date_return,
@@ -159,6 +162,7 @@ router.put(
         instruction = ?,
         notes = ?,
         status = ?,
+        assigned_mechanic = ?,
         date_finished = ?,
         contact_method = ?,
         date_return = ?
@@ -173,6 +177,7 @@ router.put(
       payload.instruction,
       payload.notes,
       payload.status,
+      payload.assigned_mechanic,
       payload.date_finished,
       payload.contact_method,
       payload.date_return,
