@@ -22,6 +22,7 @@ function getJobPartPayload(body) {
     bill_no: normalizeText(body.bill_no),
     charge_price: parseNumber(body.charge_price, 'charge_price', errors, {
       min: 0,
+      required: true,
     }),
     errors,
     job_no: parseInteger(body.job_no, 'job_no', errors, {
@@ -42,16 +43,38 @@ function getJobPartPayload(body) {
 router.get(
   '/',
   asyncHandler(async (req, res) => {
+    const errors = [];
+    const job_no = parseInteger(req.query.job_no, 'job_no', errors, { min: 1 });
+    const part_id = parseInteger(req.query.part_id, 'part_id', errors, { min: 1 });
+
+    if (sendValidationErrors(res, errors)) {
+      return;
+    }
+
+    const whereClauses = [];
+    const params = [];
+
+    if (job_no !== null) {
+      whereClauses.push('jp.job_no = ?');
+      params.push(job_no);
+    }
+
+    if (part_id !== null) {
+      whereClauses.push('jp.part_id = ?');
+      params.push(part_id);
+    }
+
     const sql = `
       SELECT
         jp.*,
         p.part_description
       FROM Job_Part jp
       LEFT JOIN Part p ON jp.part_id = p.part_id
+      ${whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : ''}
       ORDER BY jp.job_part_id
     `;
 
-    const rows = await all(db, sql);
+    const rows = await all(db, sql, params);
 
     return res.json(rows);
   })

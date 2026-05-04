@@ -89,9 +89,6 @@ function CustomerForm({
             <h2 className="section-title">
               {mode === 'edit' ? 'Edit Customer' : 'Add Customer'}
             </h2>
-            <p className="section-copy">
-              Keep customer details split between contact info and address for clarity.
-            </p>
           </div>
 
           <button className="secondary-button" onClick={onClose} type="button">

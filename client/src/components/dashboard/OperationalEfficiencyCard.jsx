@@ -1,21 +1,9 @@
 import DashboardSection from './DashboardSection';
+import { formatCurrency } from '../../utils/formatters';
 
 function OperationalEfficiencyCard({ repairTime, mechanicsPerformance, labourMetrics }) {
-  function formatCurrency(value) {
-    return new Intl.NumberFormat('en-GB', {
-      currency: 'GBP',
-      style: 'currency',
-    }).format(value || 0);
-  }
-
   return (
     <DashboardSection eyebrow="Productivity" title="Operational efficiency">
-      <p className="section-copy">
-        Track repair speed, mechanic workload, and labour costs. These metrics help optimize your
-        team's productivity and identify bottlenecks.
-      </p>
-
-      {/* Repair Time Summary */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
         <div className="dashboard-kpi-card tone-forest">
           <span className="dashboard-kpi-label">Avg repair time</span>
@@ -36,7 +24,6 @@ function OperationalEfficiencyCard({ repairTime, mechanicsPerformance, labourMet
         </div>
       </div>
 
-      {/* Mechanics Performance */}
       <div>
         <h4 style={{ fontSize: '0.95rem', marginBottom: '12px', color: 'var(--ink-soft)' }}>
           Mechanic performance

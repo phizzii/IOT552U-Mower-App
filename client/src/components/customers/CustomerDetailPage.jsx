@@ -1,37 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { API_BASE_URL } from '../../config';
-
-
-async function requestJson(path) {
-  const response = await fetch(`${API_BASE_URL}${path}`);
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const message = payload.error || 'The request could not be completed.';
-    throw new Error(message);
-  }
-
-  return payload;
-}
-
-function formatDate(value) {
-  if (!value) {
-    return 'Not set';
-  }
-
-  return new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(`${value}T00:00:00`));
-}
-
-function formatCurrency(value) {
-  return new Intl.NumberFormat('en-GB', {
-    currency: 'GBP',
-    style: 'currency',
-  }).format(Number(value || 0));
-}
+import { fetchJson } from '../../utils/api';
+import { formatCurrency, formatDate } from '../../utils/formatters';
 
 function renderAddress(customer) {
   return [
@@ -63,10 +32,10 @@ function CustomerDetailPage({
 
       try {
         const [customerData, allMachines, allJobs, allInvoices] = await Promise.all([
-          requestJson(`/customers/${customerId}`),
-          requestJson('/machines'),
-          requestJson('/repair-jobs'),
-          requestJson('/invoices'),
+          fetchJson(`/customers/${customerId}`),
+          fetchJson('/machines'),
+          fetchJson('/repair-jobs'),
+          fetchJson('/invoices'),
         ]);
 
         setCustomer(customerData);
@@ -277,13 +246,13 @@ function CustomerDetailPage({
             ) : (
               <div className="invoice-list">
                 {invoices.map((invoice) => (
-                  <div className="invoice-item" key={invoice.invoice_id}>
+                  <div className="invoice-item" key={invoice.invoice_no}>
                     <div className="invoice-header">
-                      <div className="invoice-id">Invoice #{invoice.invoice_id}</div>
-                      <span className="payment-status">{invoice.payment_status || 'Unpaid'}</span>
+                      <div className="invoice-id">Invoice #{invoice.invoice_no}</div>
+                      <span className="payment-status">{invoice.date_paid ? 'Paid' : 'Unpaid'}</span>
                     </div>
                     <div className="invoice-details">
-                      <span>{formatDate(invoice.date_issued)}</span>
+                      <span>{invoice.date_paid ? formatDate(invoice.date_paid) : 'Pending'}</span>
                       <span>{formatCurrency(invoice.total_cost)}</span>
                     </div>
                   </div>

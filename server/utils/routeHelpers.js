@@ -67,6 +67,21 @@ function normalizeText(value) {
   return String(value).trim();
 }
 
+function parseText(value, fieldName, errors, options = {}) {
+  const { required = false } = options;
+  const normalizedValue = normalizeText(value);
+
+  if (normalizedValue === null) {
+    if (required) {
+      errors.push(`${fieldName} is required`);
+    }
+
+    return null;
+  }
+
+  return normalizedValue;
+}
+
 function validateRequired(body, fields) {
   return fields
     .filter((field) => !hasValue(body[field]))
@@ -167,6 +182,7 @@ module.exports = {
   asyncHandler,
   getOne,
   normalizeText,
+  parseText,
   parseDate,
   parseInteger,
   parseNumber,

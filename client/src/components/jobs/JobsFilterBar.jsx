@@ -11,10 +11,6 @@ function JobsFilterBar({
       <div className="jobs-filter-copy">
         <span className="section-label">Workflow Filters</span>
         <h2 className="section-title jobs-panel-title">Workshop Queue</h2>
-        <p className="section-copy">
-          Focus the live jobs list by status, customer, and logged date, then open
-          a job to manage parts, labour, and billing in one place.
-        </p>
       </div>
 
       <div className="jobs-filter-grid">

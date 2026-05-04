@@ -5,9 +5,9 @@ const {
   all,
   asyncHandler,
   getOne,
-  normalizeText,
   parseDate,
   parseInteger,
+  parseText,
   run,
   sendValidationErrors,
   validateIdParam,
@@ -17,24 +17,28 @@ function getRepairJobPayload(body) {
   const errors = [];
 
   return {
-    assigned_mechanic: normalizeText(body.assigned_mechanic),
-    contact_method: normalizeText(body.contact_method),
+    assigned_mechanic: parseText(body.assigned_mechanic, 'assigned_mechanic', errors, {
+      required: true,
+    }),
+    contact_method: parseText(body.contact_method, 'contact_method', errors),
     customer_id: parseInteger(body.customer_id, 'customer_id', errors, {
       min: 1,
       required: true,
     }),
     date_collected: parseDate(body.date_collected, 'date_collected', errors),
     date_finished: parseDate(body.date_finished, 'date_finished', errors),
-    date_logged: parseDate(body.date_logged, 'date_logged', errors),
+    date_logged: parseDate(body.date_logged, 'date_logged', errors, {
+      required: true,
+    }),
     date_return: parseDate(body.date_return, 'date_return', errors),
     errors,
-    instruction: normalizeText(body.instruction),
+    instruction: parseText(body.instruction, 'instruction', errors, { required: true }),
     machine_id: parseInteger(body.machine_id, 'machine_id', errors, {
       min: 1,
       required: true,
     }),
-    notes: normalizeText(body.notes),
-    status: normalizeText(body.status),
+    notes: parseText(body.notes, 'notes', errors),
+    status: parseText(body.status, 'status', errors, { required: true }),
   };
 }
 

@@ -8,9 +8,6 @@ function ServicesList({ services, onDelete, onEdit, onView }) {
       <div className="services-list-header">
         <div>
           <h3 className="section-title">Service Catalogue</h3>
-          <p className="section-copy">
-            Standard labour and service items for easy job quoting and billing.
-          </p>
         </div>
         <div className="services-list-count">
           {filteredServices.length} service{filteredServices.length !== 1 ? 's' : ''}

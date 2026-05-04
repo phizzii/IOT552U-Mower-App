@@ -10,8 +10,7 @@ import JobsFilterBar from '../components/jobs/JobsFilterBar';
 import JobsTable from '../components/jobs/JobsTable';
 import JobWizard from '../components/jobs/JobWizard';
 import PageHeader from '../components/navigation/PageHeader';
-import { API_BASE_URL } from '../config';
-
+import { fetchJson } from '../utils/api';
 
 const emptyWorkspace = {
   customers: [],
@@ -98,25 +97,6 @@ function buildRepairJobPayload(job) {
   };
 }
 
-async function requestJson(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  });
-
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const message = payload.error || payload.errors?.join(', ') || 'The request could not be completed.';
-    throw new Error(message);
-  }
-
-  return payload;
-}
-
 function JobsPage() {
   const [actionError, setActionError] = useState('');
   const [actionMessage, setActionMessage] = useState('');
@@ -154,15 +134,15 @@ function JobsPage() {
         jobLineItems,
         invoices,
       ] = await Promise.all([
-        requestJson('/repair-jobs'),
-        requestJson('/customers'),
-        requestJson('/machines'),
-        requestJson('/machine-types'),
-        requestJson('/services'),
-        requestJson('/parts'),
-        requestJson('/job-parts'),
-        requestJson('/job-line-items'),
-        requestJson('/invoices'),
+        fetchJson('/repair-jobs'),
+        fetchJson('/customers'),
+        fetchJson('/machines'),
+        fetchJson('/machine-types'),
+        fetchJson('/services'),
+        fetchJson('/parts'),
+        fetchJson('/job-parts'),
+        fetchJson('/job-line-items'),
+        fetchJson('/invoices'),
       ]);
 
       startTransition(() => {
@@ -324,7 +304,7 @@ function JobsPage() {
           serial_no: formState.newMachine.serial_no,
         };
 
-        const machineResult = await requestJson('/machines', {
+        const machineResult = await fetchJson('/machines', {
           body: JSON.stringify(machinePayload),
           method: 'POST',
         });
@@ -349,12 +329,12 @@ function JobsPage() {
       let jobNo = wizardState.initialJob?.job_no;
 
       if (wizardState.mode === 'edit' && wizardState.initialJob) {
-        await requestJson(`/repair-jobs/${wizardState.initialJob.job_no}`, {
+        await fetchJson(`/repair-jobs/${wizardState.initialJob.job_no}`, {
           body: JSON.stringify(repairJobPayload),
           method: 'PUT',
         });
       } else {
-        const result = await requestJson('/repair-jobs', {
+        const result = await fetchJson('/repair-jobs', {
           body: JSON.stringify(repairJobPayload),
           method: 'POST',
         });
@@ -385,7 +365,7 @@ function JobsPage() {
     setActionError('');
 
     try {
-      await requestJson(`/repair-jobs/${selectedJob.job_no}`, {
+      await fetchJson(`/repair-jobs/${selectedJob.job_no}`, {
         body: JSON.stringify(
           buildRepairJobPayload({
             ...selectedJob,
@@ -416,7 +396,7 @@ function JobsPage() {
         (part) => String(part.part_id) === String(partDraft.part_id)
       );
 
-      await requestJson('/job-parts', {
+      await fetchJson('/job-parts', {
         body: JSON.stringify({
           bill_date: partDraft.bill_date,
           bill_no: partDraft.bill_no,
@@ -461,7 +441,7 @@ function JobsPage() {
         (labourHours !== null && hourlyRate !== null ? labourHours * hourlyRate : null) ??
         Number(selectedService?.price || 0);
 
-      await requestJson('/job-line-items', {
+      await fetchJson('/job-line-items', {
         body: JSON.stringify({
           description:
             serviceDraft.description || selectedService?.service_description || '',
@@ -495,7 +475,7 @@ function JobsPage() {
     setActionError('');
 
     try {
-      await requestJson('/invoices', {
+      await fetchJson('/invoices', {
         body: JSON.stringify({
           customer_id: selectedJob.customer_id,
           date_paid: invoiceDraft.date_paid,
@@ -518,13 +498,9 @@ function JobsPage() {
   if (isLoading) {
     return (
       <div className="jobs-page">
-        <PageHeader
-          eyebrow="Core Workflow"
-          summary="Loading the repair queue, workshop actions, and linked billing data."
-          title="Jobs"
-        />
+        <PageHeader eyebrow="Core Workflow" title="Jobs" />
         <section className="surface-card">
-          <p className="section-copy">Loading the jobs workspace...</p>
+          <p>Loading the jobs workspace...</p>
         </section>
       </div>
     );
@@ -533,11 +509,7 @@ function JobsPage() {
   if (error) {
     return (
       <div className="jobs-page">
-        <PageHeader
-          eyebrow="Core Workflow"
-          summary="The jobs workspace depends on repair jobs, parts, services, and invoice data being available."
-          title="Jobs"
-        />
+        <PageHeader eyebrow="Core Workflow" title="Jobs" />
         <section className="surface-card">
           <div className="feedback-banner error">{error}</div>
         </section>
@@ -547,11 +519,7 @@ function JobsPage() {
 
   return (
     <div className="jobs-page">
-      <PageHeader
-        eyebrow="Core Workflow"
-        summary="This is the operational hub for repair intake, workshop progress, labour lines, parts usage, and invoice generation."
-        title="Jobs"
-      />
+      <PageHeader eyebrow="Core Workflow" title="Jobs" />
 
       <div className="jobs-workspace">
         <div className="jobs-primary-column">

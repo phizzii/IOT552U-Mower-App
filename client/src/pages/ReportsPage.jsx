@@ -5,7 +5,7 @@ import OperationalEfficiencyCard from '../components/dashboard/OperationalEffici
 import LogisticsAnalysisCard from '../components/dashboard/LogisticsAnalysisCard';
 import CustomerValueCard from '../components/dashboard/CustomerValueCard';
 import PageHeader from '../components/navigation/PageHeader';
-import { API_BASE_URL } from '../config';
+import { fetchJson } from '../utils/api';
 
 function ReportsPage() {
   const [jobStatus, setJobStatus] = useState(null);
@@ -29,12 +29,7 @@ function ReportsPage() {
         ];
 
         const responses = await Promise.all(
-          endpoints.map((endpoint) =>
-            fetch(`${API_BASE_URL}${endpoint}`).then((res) => {
-              if (!res.ok) throw new Error(`Failed to fetch ${endpoint}`);
-              return res.json();
-            })
-          )
+          endpoints.map((endpoint) => fetchJson(endpoint))
         );
 
         setJobStatus(responses[0]);
@@ -56,11 +51,7 @@ function ReportsPage() {
   if (loading) {
     return (
       <div className="placeholder-page">
-        <PageHeader
-          eyebrow="Insights"
-          summary="Loading your operational analytics..."
-          title="Reports & Visualisations"
-        />
+        <PageHeader eyebrow="Insights" title="Reports & Visualisations" />
         <div className="dashboard-grid">
           {[1, 2, 3, 4].map((item) => (
             <div className="surface-card dashboard-loading-card" key={item} />
@@ -73,11 +64,7 @@ function ReportsPage() {
   if (error) {
     return (
       <div className="placeholder-page">
-        <PageHeader
-          eyebrow="Insights"
-          summary="Data unavailable"
-          title="Reports & Visualisations"
-        />
+        <PageHeader eyebrow="Insights" title="Reports & Visualisations" />
         <section className="surface-card dashboard-error-card" data-reveal="error">
           <div className="section-label">Connection Issue</div>
           <h3 className="section-title">Analytics data could not be loaded</h3>
@@ -91,11 +78,7 @@ function ReportsPage() {
 
   return (
     <div className="placeholder-page">
-      <PageHeader
-        eyebrow="Insights"
-        summary="Make data-driven decisions with real-time operational analytics"
-        title="Reports & Visualisations"
-      />
+      <PageHeader eyebrow="Insights" title="Reports & Visualisations" />
 
       <div className="dashboard-grid">
         <div className="page-stack">

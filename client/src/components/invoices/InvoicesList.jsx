@@ -8,9 +8,6 @@ function InvoicesList({ invoices, onDelete, onEdit, onView }) {
       <div className="invoices-list-header">
         <div>
           <h3 className="section-title">Invoice Ledger</h3>
-          <p className="section-copy">
-            Review billed work, payment state, and customer charge history in one place.
-          </p>
         </div>
         <div className="invoices-list-count">
           {filteredInvoices.length} invoice{filteredInvoices.length !== 1 ? 's' : ''}

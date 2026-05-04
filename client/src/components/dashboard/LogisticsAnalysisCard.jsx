@@ -1,21 +1,9 @@
 import DashboardSection from './DashboardSection';
+import { formatCurrency } from '../../utils/formatters';
 
 function LogisticsAnalysisCard({ summary, costDistanceAnalysis }) {
-  function formatCurrency(value) {
-    return new Intl.NumberFormat('en-GB', {
-      currency: 'GBP',
-      style: 'currency',
-    }).format(value || 0);
-  }
-
   return (
     <DashboardSection eyebrow="Logistics" title="Delivery & cost analysis">
-      <p className="section-copy">
-        Understand delivery costs relative to distance. Use this data to optimize routes and pricing
-        strategies for better margins.
-      </p>
-
-      {/* Summary KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
         <div className="dashboard-kpi-card tone-forest">
           <span className="dashboard-kpi-label">Total deliveries</span>
@@ -30,7 +18,6 @@ function LogisticsAnalysisCard({ summary, costDistanceAnalysis }) {
         </div>
       </div>
 
-      {/* Cost vs Distance Analysis */}
       <div>
         <h4 style={{ fontSize: '0.95rem', marginBottom: '12px', color: 'var(--ink-soft)' }}>
           Cost by distance

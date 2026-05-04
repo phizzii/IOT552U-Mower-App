@@ -1,25 +1,6 @@
 import { startTransition, useCallback, useEffect, useMemo, useState } from 'react';
-import { API_BASE_URL } from '../../config';
-
-
-async function requestJson(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  });
-
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const message = payload.error || payload.errors?.join(', ') || 'The request could not be completed.';
-    throw new Error(message);
-  }
-
-  return payload;
-}
+import { fetchJson } from '../../utils/api';
+import { formatCurrency } from '../../utils/formatters';
 
 function ServiceDetailPage({ serviceId, onClose, onEdit }) {
   const [service, setService] = useState(null);
@@ -33,13 +14,13 @@ function ServiceDetailPage({ serviceId, onClose, onEdit }) {
 
     try {
       const [serviceData, jobLineItemsData] = await Promise.all([
-        requestJson(`/services/${serviceId}`),
-        requestJson('/job-line-items'),
+        fetchJson(`/services/${serviceId}`),
+        fetchJson(`/job-line-items?service_id=${serviceId}`),
       ]);
 
       startTransition(() => {
         setService(serviceData);
-        setJobLineItems(jobLineItemsData.filter((item) => item.service_id === serviceData.service_id));
+        setJobLineItems(jobLineItemsData);
       });
     } catch (loadError) {
       setError(loadError.message || 'Service details could not be loaded.');
@@ -120,7 +101,7 @@ function ServiceDetailPage({ serviceId, onClose, onEdit }) {
             <div className="pricing-grid">
               <div className="pricing-item">
                 <span className="pricing-label">Standard price</span>
-                <span className="pricing-value">£{Number(service.price).toFixed(2)}</span>
+                <span className="pricing-value">{formatCurrency(service.price)}</span>
               </div>
             </div>
           </div>
@@ -133,11 +114,11 @@ function ServiceDetailPage({ serviceId, onClose, onEdit }) {
                 <span className="stat-label">Job uses</span>
               </div>
               <div className="stat-item">
-                <span className="stat-value">£{usageStats.totalRevenue.toFixed(2)}</span>
+                <span className="stat-value">{formatCurrency(usageStats.totalRevenue)}</span>
                 <span className="stat-label">Total revenue</span>
               </div>
               <div className="stat-item">
-                <span className="stat-value">£{usageStats.averageRevenue.toFixed(2)}</span>
+                <span className="stat-value">{formatCurrency(usageStats.averageRevenue)}</span>
                 <span className="stat-label">Avg value</span>
               </div>
               <div className="stat-item">
@@ -168,7 +149,7 @@ function ServiceDetailPage({ serviceId, onClose, onEdit }) {
                       <span className="usage-date">Unknown</span>
                     </div>
                     <div className="usage-details">
-                      <span className="usage-quantity">£{Number(item.line_total).toFixed(2)}</span>
+                      <span className="usage-quantity">{formatCurrency(item.line_total)}</span>
                       <span className="usage-total">{item.description || 'Service line'}</span>
                     </div>
                   </div>

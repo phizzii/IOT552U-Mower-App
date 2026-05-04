@@ -6,11 +6,6 @@ function JobStatusAnalysisCard({ byStatus, incompleteCount, totalJobs }) {
 
   return (
     <DashboardSection eyebrow="Workshop Load" title="Job status snapshot">
-      <p className="section-copy">
-        Visual breakdown of all jobs by status. Focus on the incomplete jobs—these represent
-        active work and potential revenue.
-      </p>
-
       <div className="dashboard-status-list">
         {byStatus.map((item) => (
           <div className="dashboard-status-row" key={item.label}>

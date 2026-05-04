@@ -102,9 +102,6 @@ function InvoiceForm({
             <h3 className="form-title">
               {mode === 'create' ? 'Add Invoice' : 'Edit Invoice'}
             </h3>
-            <p className="section-copy">
-              Create billing records for jobs or direct sale items, and keep payments aligned with workshop activity.
-            </p>
           </div>
           <button aria-label="Close form" className="close-button" onClick={onClose} type="button">
             ×

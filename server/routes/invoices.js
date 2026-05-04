@@ -36,7 +36,10 @@ function getInvoicePayload(body) {
     job_no,
     payment_type: normalizeText(body.payment_type),
     sale_item_no,
-    total_cost: parseNumber(body.total_cost, 'total_cost', errors, { min: 0 }),
+    total_cost: parseNumber(body.total_cost, 'total_cost', errors, {
+      min: 0,
+      required: true,
+    }),
   };
 }
 

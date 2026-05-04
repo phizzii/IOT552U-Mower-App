@@ -1,30 +1,11 @@
 import DashboardSection from './DashboardSection';
+import { formatCurrency, formatShortDate } from '../../utils/formatters';
 
 function RevenueAnalysisCard({ revenueOverTime, serviceBreakdown, totalRevenue }) {
   const maxRevenue = revenueOverTime.reduce((highest, point) => Math.max(highest, point.revenue), 0);
 
-  function formatCurrency(value) {
-    return new Intl.NumberFormat('en-GB', {
-      currency: 'GBP',
-      style: 'currency',
-    }).format(value || 0);
-  }
-
-  function formatDate(dateStr) {
-    if (!dateStr) return 'No date';
-    return new Intl.DateTimeFormat('en-GB', {
-      day: '2-digit',
-      month: 'short',
-    }).format(new Date(`${dateStr}T00:00:00`));
-  }
-
   return (
     <DashboardSection eyebrow="Billing Snapshot" title="Revenue analysis">
-      <p className="section-copy">
-        Recent invoice values (last 30 days) and revenue breakdown by service type. This helps
-        identify your most profitable service offerings.
-      </p>
-
       <div>
         <h4 style={{ fontSize: '0.95rem', marginBottom: '12px', color: 'var(--ink-soft)' }}>
           Revenue over time
@@ -41,7 +22,7 @@ function RevenueAnalysisCard({ revenueOverTime, serviceBreakdown, totalRevenue }
                     }}
                   />
                 </div>
-                <span className="dashboard-trend-label">{formatDate(point.date)}</span>
+                <span className="dashboard-trend-label">{formatShortDate(point.date)}</span>
                 <strong className="dashboard-trend-value">{formatCurrency(point.revenue)}</strong>
               </div>
             ))
