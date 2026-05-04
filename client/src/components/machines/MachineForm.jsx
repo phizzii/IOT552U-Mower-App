@@ -94,9 +94,6 @@ function MachineForm({
             <h2 className="section-title">
               {mode === 'edit' ? 'Edit Machine' : 'Add Machine'}
             </h2>
-            <p className="section-copy">
-              Link equipment to customers and track maintenance history.
-            </p>
           </div>
 
           <button className="secondary-button" onClick={onClose} type="button">

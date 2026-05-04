@@ -216,13 +216,9 @@ function SettingsPage() {
   if (isLoading) {
     return (
       <div className="settings-page">
-        <PageHeader
-          eyebrow="Configuration"
-          summary="Loading machine types and service definitions."
-          title="Settings"
-        />
+        <PageHeader eyebrow="Configuration" title="Settings" />
         <section className="surface-card">
-          <p className="section-copy">Loading settings workspace...</p>
+          <p>Loading settings workspace...</p>
         </section>
       </div>
     );
@@ -230,11 +226,7 @@ function SettingsPage() {
 
   return (
     <div className="settings-page">
-      <PageHeader
-        eyebrow="Configuration"
-        summary="Manage machine categories and service pricing without pulling those low-frequency tasks into the main workshop workflow."
-        title="Settings"
-      />
+      <PageHeader eyebrow="Configuration" title="Settings" />
 
       <section className="settings-metrics" data-reveal="settings-metrics">
         <div className="surface-card metric-chip">
@@ -268,9 +260,6 @@ function SettingsPage() {
             <div>
               <span className="section-label">Machine Types</span>
               <h2 className="section-title jobs-panel-title">Equipment Categories</h2>
-              <p className="section-copy">
-                Use these as the parent definitions for workshop intake and service pricing.
-              </p>
             </div>
           </div>
 
@@ -370,9 +359,6 @@ function SettingsPage() {
             <div>
               <span className="section-label">Services</span>
               <h2 className="section-title jobs-panel-title">Pricing & Definitions</h2>
-              <p className="section-copy">
-                Build out the service catalogue that appears later in job line items and pricing flows.
-              </p>
             </div>
             <div className="jobs-table-count">
               {selectedMachineType ? selectedMachineType.type_name : 'All machine types'}

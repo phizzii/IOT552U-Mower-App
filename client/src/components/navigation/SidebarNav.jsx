@@ -57,10 +57,6 @@ function SidebarNav({ navigationItems }) {
             </h1>
           </div>
         </div>
-        <p className="brand-note">
-          Track intake, workshop progress, and billing from one operational hub
-          designed around the way repair jobs actually move.
-        </p>
       </div>
 
       <div className="nav-section">
@@ -78,14 +74,6 @@ function SidebarNav({ navigationItems }) {
             />
           ))}
         </nav>
-      </div>
-
-      <div className="sidebar-footer">
-        <span className="footer-label">Workshop Focus</span>
-        <p className="footer-copy">
-          Use the Jobs module as the core control point for intake, status changes,
-          labour, parts usage, and invoice creation.
-        </p>
       </div>
     </aside>
   );

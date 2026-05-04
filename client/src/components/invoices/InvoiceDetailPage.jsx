@@ -38,7 +38,6 @@ function InvoiceDetailPage({ invoiceId, onClose, onEdit }) {
         <div className="form-header">
           <div>
             <h3 className="form-title">Invoice #{invoiceId}</h3>
-            <p className="section-copy">A detailed view of the billing record, customer reference, and payment status.</p>
           </div>
           <button aria-label="Close details" className="close-button" onClick={onClose} type="button">
             ×

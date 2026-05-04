@@ -1,139 +1,58 @@
-import { startTransition, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import PageHeader from '../components/navigation/PageHeader';
 import InvoiceForm from '../components/invoices/InvoiceForm';
 import InvoiceDetailPage from '../components/invoices/InvoiceDetailPage';
 import InvoicesList from '../components/invoices/InvoicesList';
+import ModuleActionCard from '../components/shared/ModuleActionCard';
+import useCrudPage from '../hooks/useCrudPage';
 import { fetchJson } from '../utils/api';
 
 function InvoicesPage() {
-  const [invoices, setInvoices] = useState([]);
-  const [customers, setCustomers] = useState([]);
-  const [jobs, setJobs] = useState([]);
-  const [saleItems, setSaleItems] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [actionError, setActionError] = useState('');
-  const [actionMessage, setActionMessage] = useState('');
-
-  const [formState, setFormState] = useState({
-    isOpen: false,
-    mode: 'create',
-    invoice: null,
-    isSubmitting: false,
-  });
-
-  const [detailState, setDetailState] = useState({
-    isOpen: false,
-    invoiceId: null,
-  });
-
-  async function loadData() {
-    setIsLoading(true);
-    setError('');
-
-    try {
-      const [invoicesData, customersData, jobsData, saleItemsData] = await Promise.all([
+  const loadData = useCallback(
+    async () => {
+      const [invoices, customers, jobs, saleItems] = await Promise.all([
         fetchJson('/invoices'),
         fetchJson('/customers'),
         fetchJson('/repair-jobs'),
         fetchJson('/sale-items'),
       ]);
+      return { customers, invoices, jobs, saleItems };
+    },
+    []
+  );
 
-      startTransition(() => {
-        setInvoices(invoicesData);
-        setCustomers(customersData);
-        setJobs(jobsData);
-        setSaleItems(saleItemsData);
-      });
-    } catch (loadError) {
-      setError(loadError.message || 'Invoices could not be loaded.');
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const {
+    actionError,
+    actionMessage,
+    closeDetail,
+    closeForm,
+    data,
+    detailState,
+    error,
+    formState,
+    isLoading,
+    items: invoices,
+    openCreate,
+    openDetail,
+    openEdit,
+    submitForm,
+    deleteItem,
+  } = useCrudPage({
+    basePath: '/invoices',
+    getItems: (nextData) => nextData.invoices,
+    itemIdKey: 'invoice_no',
+    itemLabel: 'Invoice',
+    loadData,
+    loadErrorMessage: 'Invoices could not be loaded.',
+  });
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  function handleAddInvoice() {
-    setFormState({ isOpen: true, mode: 'create', invoice: null, isSubmitting: false });
-    setActionError('');
-    setActionMessage('');
-  }
-
-  function handleEditInvoice(invoiceId) {
-    const invoice = invoices.find((item) => item.invoice_no === invoiceId);
-    if (!invoice) {
-      setActionError('Invoice not found.');
-      return;
-    }
-    setFormState({ isOpen: true, mode: 'edit', invoice, isSubmitting: false });
-    setActionError('');
-    setActionMessage('');
-  }
-
-  async function handleFormSubmit(formData) {
-    setFormState((current) => ({ ...current, isSubmitting: true }));
-    setActionError('');
-    setActionMessage('');
-
-    try {
-      if (formState.mode === 'create') {
-        await fetchJson('/invoices', {
-          body: JSON.stringify(formData),
-          method: 'POST',
-        });
-        setActionMessage('Invoice created successfully.');
-      } else {
-        await fetchJson(`/invoices/${formState.invoice.invoice_no}`, {
-          body: JSON.stringify(formData),
-          method: 'PUT',
-        });
-        setActionMessage('Invoice updated successfully.');
-      }
-
-      setFormState({ isOpen: false, mode: 'create', invoice: null, isSubmitting: false });
-      await loadData();
-    } catch (submitError) {
-      setActionError(submitError.message || 'The request could not be completed.');
-      setFormState((current) => ({ ...current, isSubmitting: false }));
-    }
-  }
-
-  function handleFormClose() {
-    setFormState({ isOpen: false, mode: 'create', invoice: null, isSubmitting: false });
-    setActionError('');
-  }
-
-  async function handleDeleteInvoice(invoiceId) {
-    setActionError('');
-    setActionMessage('');
-
-    try {
-      await fetchJson(`/invoices/${invoiceId}`, { method: 'DELETE' });
-      setActionMessage('Invoice deleted successfully.');
-      await loadData();
-    } catch (deleteError) {
-      setActionError(deleteError.message || 'Could not delete invoice.');
-    }
-  }
-
-  function handleViewInvoice(invoiceId) {
-    setDetailState({ isOpen: true, invoiceId });
-  }
-
-  function handleDetailClose() {
-    setDetailState({ isOpen: false, invoiceId: null });
-  }
+  const customers = data?.customers || [];
+  const jobs = data?.jobs || [];
+  const saleItems = data?.saleItems || [];
 
   return (
     <div className="page-wrapper">
-      <PageHeader
-        eyebrow="Invoices & Payments"
-        title="Invoices"
-        summary="Invoices should communicate exactly what the customer is paying for without forcing users to reconstruct the story from separate repair and sales views."
-      />
+      <PageHeader eyebrow="Invoices & Payments" title="Invoices" />
 
       {error ? <div className="feedback-banner error">{error}</div> : null}
       {actionError ? <div className="feedback-banner error">{actionError}</div> : null}
@@ -141,18 +60,12 @@ function InvoicesPage() {
 
       <div className="page-grid">
         <div className="page-stack">
-          <section className="surface-card hero-card" data-reveal="intro">
-            <div>
-              <div className="section-label">Billing Workflow</div>
-              <h3 className="section-title">Keep invoice records aligned with jobs and sales</h3>
-              <p className="section-copy">
-                Create, review, and manage invoices for repair jobs or direct sale items while tracking payment details.
-              </p>
-            </div>
-            <button className="primary-button" onClick={handleAddInvoice} type="button">
-              + New Invoice
-            </button>
-          </section>
+          <ModuleActionCard
+            actionLabel="+ New Invoice"
+            onAction={openCreate}
+            sectionLabel="Billing"
+            title="Invoice Records"
+          />
 
           {isLoading ? (
             <div className="surface-card">
@@ -161,9 +74,9 @@ function InvoicesPage() {
           ) : (
             <InvoicesList
               invoices={invoices}
-              onDelete={handleDeleteInvoice}
-              onEdit={handleEditInvoice}
-              onView={handleViewInvoice}
+              onDelete={deleteItem}
+              onEdit={openEdit}
+              onView={openDetail}
             />
           )}
         </div>
@@ -176,17 +89,17 @@ function InvoicesPage() {
         isSubmitting={formState.isSubmitting}
         jobs={jobs}
         mode={formState.mode}
-        onClose={handleFormClose}
-        onSubmit={handleFormSubmit}
+        onClose={closeForm}
+        onSubmit={submitForm}
         saleItems={saleItems}
-        invoice={formState.invoice}
+        invoice={formState.item}
       />
 
       {detailState.isOpen && (
         <InvoiceDetailPage
-          invoiceId={detailState.invoiceId}
-          onClose={handleDetailClose}
-          onEdit={handleEditInvoice}
+          invoiceId={detailState.itemId}
+          onClose={closeDetail}
+          onEdit={openEdit}
         />
       )}
     </div>

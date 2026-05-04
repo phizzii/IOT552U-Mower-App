@@ -103,9 +103,6 @@ function PartForm({
             <h3 className="form-title">
               {mode === 'create' ? 'Add Part' : 'Edit Part'}
             </h3>
-            <p className="section-copy">
-              Track stock and pricing with a focused inventory card.
-            </p>
           </div>
 
           <button

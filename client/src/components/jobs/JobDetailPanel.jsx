@@ -43,10 +43,6 @@ function JobDetailPanel({
       <section className="surface-card job-detail-card" data-reveal="job-empty">
         <span className="section-label">Job Detail</span>
         <h2 className="section-title jobs-panel-title">Select a repair job</h2>
-        <p className="section-copy">
-          Choose a row from the jobs list to view customer context, machine
-          details, parts, labour, and invoice actions.
-        </p>
       </section>
     );
   }
@@ -233,10 +229,6 @@ function JobDetailPanel({
           <div>
             <span className="section-label">Repair Job Record</span>
             <h2 className="section-title jobs-panel-title">Repair Job #{job.job_no}</h2>
-            <p className="section-copy">
-              Keep status, customer context, machine details, and billing aligned
-              once the workshop actions above are in place.
-            </p>
           </div>
 
           <button className="secondary-button" onClick={onEditJob} type="button">

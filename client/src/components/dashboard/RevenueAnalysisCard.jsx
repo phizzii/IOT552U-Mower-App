@@ -6,11 +6,6 @@ function RevenueAnalysisCard({ revenueOverTime, serviceBreakdown, totalRevenue }
 
   return (
     <DashboardSection eyebrow="Billing Snapshot" title="Revenue analysis">
-      <p className="section-copy">
-        Recent invoice values (last 30 days) and revenue breakdown by service type. This helps
-        identify your most profitable service offerings.
-      </p>
-
       <div>
         <h4 style={{ fontSize: '0.95rem', marginBottom: '12px', color: 'var(--ink-soft)' }}>
           Revenue over time

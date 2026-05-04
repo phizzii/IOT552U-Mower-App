@@ -13,16 +13,16 @@ import ServicesPage from './pages/ServicesPage';
 import SettingsPage from './pages/SettingsPage';
 
 const navigationItems = [
-  { description: 'Live workshop overview', label: 'Dashboard', shortLabel: 'Home', to: '/dashboard' },
-  { description: 'Repair workflow and status', label: 'Jobs', shortLabel: 'Jobs', to: '/jobs' },
-  { description: 'Profiles and history', label: 'Customers', shortLabel: 'Cust', to: '/customers' },
-  { description: 'Owned equipment and types', label: 'Machines', shortLabel: 'Mach', to: '/machines' },
-  { description: 'Stock and supplier pricing', label: 'Parts', shortLabel: 'Parts', to: '/parts' },
-  { description: 'Standard service pricing', label: 'Services', shortLabel: 'Serv', to: '/services' },
-  { description: 'Billing and payment tracking', label: 'Invoices', shortLabel: 'Inv', to: '/invoices' },
-  { description: 'Collections and deliveries', label: 'Deliveries', shortLabel: 'Del', to: '/deliveries' },
-  { description: 'Visual insights and trends', label: 'Reports', shortLabel: 'Rpt', to: '/reports' },
-  { description: 'Admin and configuration', label: 'Settings', shortLabel: 'Cfg', to: '/settings' },
+  { label: 'Dashboard', shortLabel: 'Home', to: '/dashboard' },
+  { label: 'Jobs', shortLabel: 'Jobs', to: '/jobs' },
+  { label: 'Customers', shortLabel: 'Cust', to: '/customers' },
+  { label: 'Machines', shortLabel: 'Mach', to: '/machines' },
+  { label: 'Parts', shortLabel: 'Parts', to: '/parts' },
+  { label: 'Services', shortLabel: 'Serv', to: '/services' },
+  { label: 'Invoices', shortLabel: 'Inv', to: '/invoices' },
+  { label: 'Deliveries', shortLabel: 'Del', to: '/deliveries' },
+  { label: 'Reports', shortLabel: 'Rpt', to: '/reports' },
+  { label: 'Settings', shortLabel: 'Cfg', to: '/settings' },
 ];
 
 function App() {

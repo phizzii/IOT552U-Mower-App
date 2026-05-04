@@ -498,13 +498,9 @@ function JobsPage() {
   if (isLoading) {
     return (
       <div className="jobs-page">
-        <PageHeader
-          eyebrow="Core Workflow"
-          summary="Loading the repair queue, workshop actions, and linked billing data."
-          title="Jobs"
-        />
+        <PageHeader eyebrow="Core Workflow" title="Jobs" />
         <section className="surface-card">
-          <p className="section-copy">Loading the jobs workspace...</p>
+          <p>Loading the jobs workspace...</p>
         </section>
       </div>
     );
@@ -513,11 +509,7 @@ function JobsPage() {
   if (error) {
     return (
       <div className="jobs-page">
-        <PageHeader
-          eyebrow="Core Workflow"
-          summary="The jobs workspace depends on repair jobs, parts, services, and invoice data being available."
-          title="Jobs"
-        />
+        <PageHeader eyebrow="Core Workflow" title="Jobs" />
         <section className="surface-card">
           <div className="feedback-banner error">{error}</div>
         </section>
@@ -527,11 +519,7 @@ function JobsPage() {
 
   return (
     <div className="jobs-page">
-      <PageHeader
-        eyebrow="Core Workflow"
-        summary="This is the operational hub for repair intake, workshop progress, labour lines, parts usage, and invoice generation."
-        title="Jobs"
-      />
+      <PageHeader eyebrow="Core Workflow" title="Jobs" />
 
       <div className="jobs-workspace">
         <div className="jobs-primary-column">

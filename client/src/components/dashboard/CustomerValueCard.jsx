@@ -4,11 +4,6 @@ import { formatCurrency } from '../../utils/formatters';
 function CustomerValueCard({ topCustomers }) {
   return (
     <DashboardSection eyebrow="Customer Analysis" title="Top customers by lifetime value">
-      <p className="section-copy">
-        Your most valuable customers. Focus retention efforts here and look for patterns in what
-        makes these relationships strong.
-      </p>
-
       <div className="dashboard-status-list">
         {topCustomers.length > 0 ? (
           topCustomers.map((customer, index) => (

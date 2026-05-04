@@ -159,10 +159,6 @@ function JobWizard({
             <h2 className="section-title jobs-panel-title">
               {mode === 'edit' ? 'Edit Repair Job' : 'Create Repair Job'}
             </h2>
-            <p className="section-copy">
-              Move through the workflow step by step instead of forcing the whole
-              intake into one long form.
-            </p>
           </div>
 
           <button className="secondary-button" onClick={onClose} type="button">

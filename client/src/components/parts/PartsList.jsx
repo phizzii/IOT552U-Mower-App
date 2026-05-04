@@ -10,9 +10,6 @@ function PartsList({ onDelete, onEdit, onView, parts }) {
       <div className="parts-list-header">
         <div>
           <h3 className="section-title">Parts Inventory</h3>
-          <p className="section-copy">
-            Track stock levels, pricing, and supplier information for all parts.
-          </p>
         </div>
         <div className="parts-list-count">
           {filteredParts.length} part{filteredParts.length !== 1 ? 's' : ''}

@@ -5,11 +5,6 @@ function RevenueTrendCard({ points, totalValue }) {
 
   return (
     <DashboardSection eyebrow="Billing Snapshot" title="Recent invoice values">
-      <p className="section-copy">
-        A lightweight revenue view for now. This gives us a dependable visual anchor
-        before we bring in fuller chart components.
-      </p>
-
       <div className="dashboard-trend">
         {points.map((point) => (
           <div className="dashboard-trend-item" key={point.label}>

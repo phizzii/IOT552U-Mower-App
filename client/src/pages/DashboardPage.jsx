@@ -208,11 +208,7 @@ function DashboardPage() {
   if (isLoading) {
     return (
       <div className="placeholder-page dashboard-page">
-        <PageHeader
-          eyebrow="Workshop Overview"
-          summary="Loading the latest workshop activity, billing status, and delivery highlights."
-          title="Dashboard"
-        />
+        <PageHeader eyebrow="Workshop Overview" title="Dashboard" />
 
         <div className="dashboard-kpi-grid">
           {['A', 'B', 'C', 'D'].map((item) => (
@@ -226,11 +222,7 @@ function DashboardPage() {
   if (error || !dashboardData) {
     return (
       <div className="placeholder-page dashboard-page">
-        <PageHeader
-          eyebrow="Workshop Overview"
-          summary="The dashboard could not load its operational data."
-          title="Dashboard"
-        />
+        <PageHeader eyebrow="Workshop Overview" title="Dashboard" />
 
         <section className="surface-card dashboard-error-card" data-reveal="error">
           <div className="section-label">Connection Issue</div>
@@ -245,11 +237,7 @@ function DashboardPage() {
 
   return (
     <div className="placeholder-page dashboard-page">
-      <PageHeader
-        eyebrow="Workshop Overview"
-        summary="Track active jobs, billing follow-up, recent activity, and delivery signals from one operational snapshot."
-        title="Dashboard"
-      />
+      <PageHeader eyebrow="Workshop Overview" title="Dashboard" />
 
       <div className="dashboard-kpi-grid">
         {dashboardData.kpis.map((kpi) => (

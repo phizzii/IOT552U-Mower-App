@@ -135,14 +135,6 @@ textarea {
   display: inline-block;
 }
 
-.brand-note {
-  color: var(--ink-soft);
-  font-size: 0.88rem;
-  line-height: 1.5;
-  margin: 0;
-  max-width: 24ch;
-}
-
 .nav-section {
   display: grid;
   align-content: start;
@@ -206,15 +198,6 @@ textarea {
   font-weight: 700;
 }
 
-.nav-item-description {
-  color: var(--ink-soft);
-  font-size: 0.78rem;
-}
-
-.nav-item.is-active .nav-item-description {
-  color: rgba(247, 243, 235, 0.7);
-}
-
 .nav-item-tag {
   align-items: center;
   background: rgba(48, 92, 71, 0.08);
@@ -231,30 +214,6 @@ textarea {
 .nav-item.is-active .nav-item-tag {
   background: rgba(255, 255, 255, 0.12);
   color: #f7f3eb;
-}
-
-.sidebar-footer {
-  align-self: end;
-  background: linear-gradient(135deg, rgba(48, 92, 71, 0.08), rgba(191, 123, 47, 0.08));
-  border: 1px solid rgba(48, 92, 71, 0.12);
-  border-radius: 22px;
-  display: grid;
-  gap: 8px;
-  padding: 16px 18px;
-}
-
-.footer-label {
-  color: var(--ink-faint);
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.footer-copy {
-  color: var(--ink-soft);
-  font-size: 0.88rem;
-  line-height: 1.5;
-  margin: 0;
 }
 
 .shell-main {
@@ -317,13 +276,6 @@ textarea {
   font-size: clamp(1.35rem, 1.8vw, 1.85rem);
   line-height: 1;
   margin: 0;
-}
-
-.top-bar-subtitle {
-  color: var(--ink-soft);
-  font-size: 0.9rem;
-  margin: 0;
-  max-width: 56ch;
 }
 
 .top-bar-utilities {
@@ -1529,7 +1481,6 @@ textarea {
   min-width: 0;
 }
 
-.mobile-nav-panel .nav-item-description,
 .mobile-nav-panel .nav-item-tag {
   color: rgba(247, 243, 235, 0.7);
 }
@@ -1600,8 +1551,7 @@ textarea {
     padding-bottom: 14px;
   }
 
-  .nav-section,
-  .sidebar-footer {
+  .nav-section {
     display: none;
   }
 
@@ -1710,10 +1660,6 @@ textarea {
 
   .brand-title {
     font-size: 1.3rem;
-  }
-
-  .brand-note {
-    max-width: none;
   }
 }
 

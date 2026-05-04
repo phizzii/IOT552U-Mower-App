@@ -90,9 +90,6 @@ function ServiceForm({
             <h3 className="form-title">
               {mode === 'create' ? 'Add Service' : 'Edit Service'}
             </h3>
-            <p className="section-copy">
-              Standardise pricing for each machine type and keep job quoting consistent.
-            </p>
           </div>
           <button
             aria-label="Close form"

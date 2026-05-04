@@ -8,11 +8,10 @@ function TopBar({ activeItem, onOpenMenu }) {
             Menu
           </button>
           <div>
-            <span className="top-bar-label">Operational Workspace</span>
+            <span className="top-bar-label">Workspace</span>
             <h2 className="top-bar-title">{activeItem.label}</h2>
           </div>
         </div>
-        <p className="top-bar-subtitle">{activeItem.description}</p>
       </div>
 
       <div className="top-bar-utilities">

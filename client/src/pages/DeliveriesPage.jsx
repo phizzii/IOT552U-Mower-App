@@ -334,7 +334,6 @@ function DeliveriesPage() {
       <PageHeader
         eyebrow="Logistics"
         title="Deliveries & Route Planning"
-        summary="Plan the delivery journey from machines ready for collection, then drop them onto the route board and review the map, order, and estimated travel insights."
       />
 
       {error ? <div className="feedback-banner error">{error}</div> : null}
@@ -346,9 +345,6 @@ function DeliveriesPage() {
             <div>
               <div className="section-label">Route planning</div>
               <h3 className="section-title">Drop machines on the route board</h3>
-              <p className="section-copy">
-                Available deliveries are drawn from the workshop queue. Drag any ready task onto the route to build your delivery schedule.
-              </p>
             </div>
           </section>
 
@@ -356,7 +352,6 @@ function DeliveriesPage() {
             <div className="delivery-panel-header">
               <div>
                 <h4 className="section-title">Route start address</h4>
-                <p className="section-copy">Choose whether the route begins from the workshop or enter a custom start address.</p>
               </div>
             </div>
 
@@ -398,7 +393,6 @@ function DeliveriesPage() {
             <div className="delivery-panel-header">
               <div>
                 <h4 className="section-title">Available deliveries</h4>
-                <p className="section-copy">Drag these entries to the route board on the right.</p>
               </div>
               <span className="badge">{availableTasks.length} ready</span>
             </div>
@@ -441,7 +435,6 @@ function DeliveriesPage() {
             <div className="delivery-panel-header">
               <div>
                 <h4 className="section-title">Recent delivery records</h4>
-                <p className="section-copy">Saved deliveries from the backend.</p>
               </div>
               <span className="badge">{deliveries.length}</span>
             </div>
@@ -466,7 +459,6 @@ function DeliveriesPage() {
             <div className="delivery-panel-header">
               <div>
                 <h4 className="section-title">Route board</h4>
-                <p className="section-copy">Drop tasks here and reorder them to shape the delivery route.</p>
               </div>
               <button className="secondary-button" onClick={autoOptimizeRoute} type="button">
                 Auto optimize
