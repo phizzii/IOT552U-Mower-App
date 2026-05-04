@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 
 const db = require('./db/db');
+const analyticsRouter = require('./routes/analytics');
 const customersRouter = require('./routes/customers');
 const deliveriesRouter = require('./routes/deliveries');
 const invoicesRouter = require('./routes/invoices');
@@ -25,6 +26,7 @@ app.get('/', (req, res) => {
   res.send('API running');
 });
 
+app.use('/api/analytics', analyticsRouter);
 app.use('/api/customers', customersRouter);
 app.use('/api/deliveries', deliveriesRouter);
 app.use('/api/invoices', invoicesRouter);

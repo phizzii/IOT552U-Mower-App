@@ -723,6 +723,10 @@ textarea {
   height: 100%;
 }
 
+.dashboard-status-bar.highlight {
+  background: linear-gradient(90deg, var(--highlight), #d9941d);
+}
+
 .dashboard-inline-note {
   align-items: center;
   background: rgba(48, 92, 71, 0.05);
@@ -923,6 +927,94 @@ textarea {
 .jobs-page {
   display: grid;
   gap: 18px;
+}
+
+.settings-page {
+  display: grid;
+  gap: 18px;
+}
+
+.settings-metrics {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.settings-workspace {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+}
+
+.settings-card {
+  display: grid;
+  gap: 18px;
+}
+
+.settings-card-header {
+  display: grid;
+  gap: 10px;
+}
+
+.settings-list {
+  display: grid;
+  gap: 12px;
+}
+
+.settings-list-row {
+  align-items: start;
+  background: rgba(48, 92, 71, 0.05);
+  border: 1px solid rgba(48, 92, 71, 0.1);
+  border-radius: 20px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr auto;
+  padding: 14px;
+}
+
+.settings-list-row.is-selected {
+  background: rgba(48, 92, 71, 0.09);
+  border-color: rgba(48, 92, 71, 0.18);
+}
+
+.settings-row-copy {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+  padding: 0;
+  text-align: left;
+}
+
+.settings-row-copy strong {
+  font-size: 0.98rem;
+}
+
+.settings-row-copy span {
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+.settings-row-actions,
+.settings-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.settings-row-actions {
+  justify-content: flex-end;
+}
+
+.settings-form {
+  display: grid;
+  gap: 14px;
+}
+
+.settings-service-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .jobs-workspace {
@@ -1526,6 +1618,8 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .settings-metrics,
+  .settings-workspace,
   .jobs-workspace,
   .job-detail-grid {
     grid-template-columns: 1fr;
@@ -1535,6 +1629,7 @@ textarea {
   .inline-form,
   .parts-form,
   .service-form,
+  .settings-service-form,
   .wizard-field-grid,
   .wizard-steps,
   .summary-metric-row {
@@ -1580,6 +1675,7 @@ textarea {
   .inline-form,
   .parts-form,
   .service-form,
+  .settings-service-form,
   .wizard-field-grid,
   .wizard-steps,
   .summary-metric-row {
