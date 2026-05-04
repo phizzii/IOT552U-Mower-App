@@ -5,9 +5,9 @@ const {
   all,
   asyncHandler,
   getOne,
-  normalizeText,
   parseInteger,
   parseNumber,
+  parseText,
   run,
   sendValidationErrors,
   validateIdParam,
@@ -15,9 +15,15 @@ const {
 
 function getJobLineItemPayload(body) {
   const errors = [];
+  const description = parseText(body.description, 'description', errors);
+  const service_id = parseInteger(body.service_id, 'service_id', errors, { min: 1 });
+
+  if (description === null && service_id === null) {
+    errors.push('Either service_id or description is required');
+  }
 
   return {
-    description: normalizeText(body.description),
+    description,
     errors,
     hourly_rate: parseNumber(body.hourly_rate, 'hourly_rate', errors, {
       min: 0,
@@ -29,14 +35,40 @@ function getJobLineItemPayload(body) {
     labour_hours: parseNumber(body.labour_hours, 'labour_hours', errors, {
       min: 0,
     }),
-    line_total: parseNumber(body.line_total, 'line_total', errors, { min: 0 }),
-    service_id: parseInteger(body.service_id, 'service_id', errors, { min: 1 }),
+    line_total: parseNumber(body.line_total, 'line_total', errors, {
+      min: 0,
+      required: true,
+    }),
+    service_id,
   };
 }
 
 router.get(
   '/',
   asyncHandler(async (req, res) => {
+    const errors = [];
+    const job_id = parseInteger(req.query.job_id, 'job_id', errors, { min: 1 });
+    const service_id = parseInteger(req.query.service_id, 'service_id', errors, {
+      min: 1,
+    });
+
+    if (sendValidationErrors(res, errors)) {
+      return;
+    }
+
+    const whereClauses = [];
+    const params = [];
+
+    if (job_id !== null) {
+      whereClauses.push('jli.job_id = ?');
+      params.push(job_id);
+    }
+
+    if (service_id !== null) {
+      whereClauses.push('jli.service_id = ?');
+      params.push(service_id);
+    }
+
     const sql = `
       SELECT
         jli.*,
@@ -45,10 +77,11 @@ router.get(
       FROM Job_Line_Item jli
       LEFT JOIN Repair_Job rj ON jli.job_id = rj.job_no
       LEFT JOIN Service s ON jli.service_id = s.service_id
+      ${whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : ''}
       ORDER BY jli.line_item_id
     `;
 
-    const rows = await all(db, sql);
+    const rows = await all(db, sql, params);
 
     return res.json(rows);
   })

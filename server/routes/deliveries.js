@@ -16,7 +16,7 @@ function getDeliveryPayload(body) {
   const errors = [];
 
   return {
-    charge: parseNumber(body.charge, 'charge', errors, { min: 0 }),
+    charge: parseNumber(body.charge, 'charge', errors, { min: 0, required: true }),
     driver_cost_per_hour: parseNumber(
       body.driver_cost_per_hour,
       'driver_cost_per_hour',
