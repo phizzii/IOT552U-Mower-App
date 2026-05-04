@@ -1,37 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { API_BASE_URL } from '../../config';
-
-
-async function requestJson(path) {
-  const response = await fetch(`${API_BASE_URL}${path}`);
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const message = payload.error || 'The request could not be completed.';
-    throw new Error(message);
-  }
-
-  return payload;
-}
-
-function formatDate(value) {
-  if (!value) {
-    return 'Not set';
-  }
-
-  return new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(`${value}T00:00:00`));
-}
-
-function formatCurrency(value) {
-  return new Intl.NumberFormat('en-GB', {
-    currency: 'GBP',
-    style: 'currency',
-  }).format(Number(value || 0));
-}
+import { fetchJson } from '../../utils/api';
+import { formatCurrency, formatDate } from '../../utils/formatters';
 
 function MachineDetailPage({
   machineId,
@@ -52,10 +21,10 @@ function MachineDetailPage({
 
       try {
         const [machineData, allJobs, allJobParts, allParts] = await Promise.all([
-          requestJson(`/machines/${machineId}`),
-          requestJson('/repair-jobs'),
-          requestJson('/job-parts'),
-          requestJson('/parts'),
+          fetchJson(`/machines/${machineId}`),
+          fetchJson('/repair-jobs'),
+          fetchJson('/job-parts'),
+          fetchJson('/parts'),
         ]);
 
         setMachine(machineData);
@@ -92,7 +61,7 @@ function MachineDetailPage({
     // Calculate total parts cost
     const totalPartsCost = jobParts.reduce((sum, jp) => {
       const part = parts.find(p => p.part_id === jp.part_id);
-      const price = part ? Number(part.cost_price || 0) : 0;
+      const price = part ? Number(part.retail_price || 0) : 0;
       const quantity = Number(jp.quantity || 0);
       return sum + (price * quantity);
     }, 0);
@@ -109,14 +78,14 @@ function MachineDetailPage({
       if (part) {
         if (!usage[part.part_id]) {
           usage[part.part_id] = {
-            part_name: part.part_name,
+            part_name: part.part_description,
             total_quantity: 0,
             total_cost: 0,
-            cost_price: Number(part.cost_price || 0),
+            cost_price: Number(part.retail_price || 0),
           };
         }
         usage[part.part_id].total_quantity += Number(jp.quantity || 0);
-        usage[part.part_id].total_cost += Number(jp.quantity || 0) * Number(part.cost_price || 0);
+        usage[part.part_id].total_cost += Number(jp.quantity || 0) * Number(part.retail_price || 0);
       }
     });
 

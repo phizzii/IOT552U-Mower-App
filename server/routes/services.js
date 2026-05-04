@@ -5,9 +5,9 @@ const {
   all,
   asyncHandler,
   getOne,
-  normalizeText,
   parseInteger,
   parseNumber,
+  parseText,
   run,
   sendValidationErrors,
   validateIdParam,
@@ -22,8 +22,13 @@ function getServicePayload(body) {
       min: 1,
       required: true,
     }),
-    price: parseNumber(body.price, 'price', errors, { min: 0 }),
-    service_description: normalizeText(body.service_description),
+    price: parseNumber(body.price, 'price', errors, { min: 0, required: true }),
+    service_description: parseText(
+      body.service_description,
+      'service_description',
+      errors,
+      { required: true }
+    ),
   };
 }
 

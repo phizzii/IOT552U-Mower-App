@@ -1,13 +1,7 @@
 import DashboardSection from './DashboardSection';
+import { formatCurrency } from '../../utils/formatters';
 
 function LogisticsAnalysisCard({ summary, costDistanceAnalysis }) {
-  function formatCurrency(value) {
-    return new Intl.NumberFormat('en-GB', {
-      currency: 'GBP',
-      style: 'currency',
-    }).format(value || 0);
-  }
-
   return (
     <DashboardSection eyebrow="Logistics" title="Delivery & cost analysis">
       <p className="section-copy">

@@ -1,29 +1,10 @@
 import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import PageHeader from '../components/navigation/PageHeader';
 import DeliveryMap from '../components/deliveries/DeliveryMap';
-import { API_BASE_URL } from '../config';
+import { fetchJson } from '../utils/api';
 
 const WORKSHOP_ADDRESS = 'Pilgrims Road, Upper Halling, Snodland, Kent ME2 1HR, United Kingdom';
 const WORKSHOP_LATLNG = [51.3544355, 0.4284428];
-
-async function requestJson(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  });
-
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const message = payload.error || payload.errors?.join(', ') || 'The request could not be completed.';
-    throw new Error(message);
-  }
-
-  return payload;
-}
 
 function renderAddress(customer) {
   if (!customer) {
@@ -176,9 +157,9 @@ function DeliveriesPage() {
 
       try {
         const [jobsData, customersData, deliveriesData] = await Promise.all([
-          requestJson('/repair-jobs'),
-          requestJson('/customers'),
-          requestJson('/deliveries'),
+          fetchJson('/repair-jobs'),
+          fetchJson('/customers'),
+          fetchJson('/deliveries'),
         ]);
 
         startTransition(() => {

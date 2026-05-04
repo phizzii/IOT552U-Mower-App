@@ -1,21 +1,4 @@
-function formatCurrency(value) {
-  return new Intl.NumberFormat('en-GB', {
-    currency: 'GBP',
-    style: 'currency',
-  }).format(Number(value || 0));
-}
-
-function formatDate(value) {
-  if (!value) {
-    return 'Not set';
-  }
-
-  return new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(`${value}T00:00:00`));
-}
+import { formatCurrency, formatDate } from '../../utils/formatters';
 
 function renderAddress(customer) {
   return [

@@ -1,14 +1,4 @@
-function formatDate(value) {
-  if (!value) {
-    return 'Not set';
-  }
-
-  return new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(`${value}T00:00:00`));
-}
+import { formatDate } from '../../utils/formatters';
 
 function machineLabel(job) {
   const make = job.machine_make || 'Machine';

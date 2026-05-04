@@ -1,25 +1,6 @@
 import { startTransition, useCallback, useEffect, useMemo, useState } from 'react';
-import { API_BASE_URL } from '../../config';
-
-
-async function requestJson(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  });
-
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const message = payload.error || payload.errors?.join(', ') || 'The request could not be completed.';
-    throw new Error(message);
-  }
-
-  return payload;
-}
+import { fetchJson } from '../../utils/api';
+import { formatCurrency, formatDate } from '../../utils/formatters';
 
 function PartDetailPage({ onClose, onEdit, partId }) {
   const [part, setPart] = useState(null);
@@ -33,8 +14,8 @@ function PartDetailPage({ onClose, onEdit, partId }) {
 
     try {
       const [partData, jobPartsData] = await Promise.all([
-        requestJson(`/parts/${partId}`),
-        requestJson(`/job-parts?part_id=${partId}`),
+        fetchJson(`/parts/${partId}`),
+        fetchJson(`/job-parts?part_id=${partId}`),
       ]);
 
       startTransition(() => {
@@ -152,15 +133,17 @@ function PartDetailPage({ onClose, onEdit, partId }) {
             <div className="pricing-grid">
               <div className="pricing-item">
                 <span className="pricing-label">Supplier Cost</span>
-                <span className="pricing-value">£{part.supplier_cost.toFixed(2)}</span>
+                <span className="pricing-value">{formatCurrency(part.supplier_cost)}</span>
               </div>
               <div className="pricing-item">
                 <span className="pricing-label">Retail Price</span>
-                <span className="pricing-value">£{part.retail_price.toFixed(2)}</span>
+                <span className="pricing-value">{formatCurrency(part.retail_price)}</span>
               </div>
               <div className="pricing-item">
                 <span className="pricing-label">Margin</span>
-                <span className="pricing-value">£{(part.retail_price - part.supplier_cost).toFixed(2)}</span>
+                <span className="pricing-value">
+                  {formatCurrency(part.retail_price - part.supplier_cost)}
+                </span>
               </div>
               <div className="pricing-item">
                 <span className="pricing-label">Margin %</span>
@@ -179,16 +162,16 @@ function PartDetailPage({ onClose, onEdit, partId }) {
                 <span className="stat-label">Total Used</span>
               </div>
               <div className="stat-item">
-                <span className="stat-value">£{statistics.totalRevenue.toFixed(2)}</span>
+                <span className="stat-value">{formatCurrency(statistics.totalRevenue)}</span>
                 <span className="stat-label">Total Revenue</span>
               </div>
               <div className="stat-item">
-                <span className="stat-value">£{statistics.averagePrice.toFixed(2)}</span>
+                <span className="stat-value">{formatCurrency(statistics.averagePrice)}</span>
                 <span className="stat-label">Average Price</span>
               </div>
               <div className="stat-item">
                 <span className="stat-value">
-                  {statistics.lastUsed ? statistics.lastUsed.toLocaleDateString() : 'Never'}
+                  {statistics.lastUsed ? formatDate(statistics.lastUsed.toISOString().slice(0, 10)) : 'Never'}
                 </span>
                 <span className="stat-label">Last Used</span>
               </div>
@@ -211,11 +194,15 @@ function PartDetailPage({ onClose, onEdit, partId }) {
                   <div className="usage-item" key={jobPart.job_part_id}>
                     <div className="usage-header">
                       <span className="job-number">Job #{jobPart.job_no}</span>
-                      <span className="usage-date">{new Date(jobPart.bill_date).toLocaleDateString()}</span>
+                      <span className="usage-date">{formatDate(jobPart.bill_date)}</span>
                     </div>
                     <div className="usage-details">
-                      <span className="usage-quantity">{jobPart.quantity} × £{jobPart.charge_price.toFixed(2)}</span>
-                      <span className="usage-total">£{(jobPart.quantity * jobPart.charge_price).toFixed(2)}</span>
+                      <span className="usage-quantity">
+                        {jobPart.quantity} × {formatCurrency(jobPart.charge_price)}
+                      </span>
+                      <span className="usage-total">
+                        {formatCurrency(jobPart.quantity * jobPart.charge_price)}
+                      </span>
                     </div>
                     {jobPart.bill_no && (
                       <div className="bill-reference">Bill: {jobPart.bill_no}</div>

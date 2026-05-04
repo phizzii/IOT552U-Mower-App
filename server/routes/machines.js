@@ -5,8 +5,8 @@ const {
   all,
   asyncHandler,
   getOne,
-  normalizeText,
   parseInteger,
+  parseText,
   run,
   sendValidationErrors,
   validateIdParam,
@@ -30,10 +30,10 @@ function getMachinePayload(body) {
         required: true,
       }
     ),
-    make: normalizeText(body.make),
-    model_no: normalizeText(body.model_no),
-    other_no: normalizeText(body.other_no),
-    serial_no: normalizeText(body.serial_no),
+    make: parseText(body.make, 'make', errors, { required: true }),
+    model_no: parseText(body.model_no, 'model_no', errors, { required: true }),
+    other_no: parseText(body.other_no, 'other_no', errors),
+    serial_no: parseText(body.serial_no, 'serial_no', errors),
   };
 }
 

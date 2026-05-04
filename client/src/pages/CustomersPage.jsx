@@ -3,27 +3,7 @@ import CustomersList from '../components/customers/CustomersList';
 import CustomerForm from '../components/customers/CustomerForm';
 import CustomerDetailPage from '../components/customers/CustomerDetailPage';
 import PageHeader from '../components/navigation/PageHeader';
-import { API_BASE_URL } from '../config';
-
-
-async function requestJson(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  });
-
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const message = payload.error || payload.errors?.join(', ') || 'The request could not be completed.';
-    throw new Error(message);
-  }
-
-  return payload;
-}
+import { fetchJson } from '../utils/api';
 
 function CustomersPage() {
   const [customers, setCustomers] = useState([]);
@@ -52,7 +32,7 @@ function CustomersPage() {
     setError('');
 
     try {
-      const data = await requestJson('/customers');
+      const data = await fetchJson('/customers');
       startTransition(() => {
         setCustomers(data);
       });
@@ -104,7 +84,7 @@ function CustomersPage() {
 
     try {
       if (formState.mode === 'create') {
-        await requestJson('/customers', {
+        await fetchJson('/customers', {
           body: JSON.stringify(formData),
           method: 'POST',
         });
@@ -113,7 +93,7 @@ function CustomersPage() {
         setFormState({ isOpen: false, mode: 'create', customer: null, isSubmitting: false });
         await loadCustomers();
       } else {
-        await requestJson(`/customers/${formState.customer.customer_id}`, {
+        await fetchJson(`/customers/${formState.customer.customer_id}`, {
           body: JSON.stringify(formData),
           method: 'PUT',
         });
@@ -139,7 +119,7 @@ function CustomersPage() {
     setActionMessage('');
 
     try {
-      await requestJson(`/customers/${customerId}`, {
+      await fetchJson(`/customers/${customerId}`, {
         method: 'DELETE',
       });
 

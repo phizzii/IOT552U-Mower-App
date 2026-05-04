@@ -1,6 +1,7 @@
 import { startTransition, useCallback, useEffect, useMemo, useState } from 'react';
 import PageHeader from '../components/navigation/PageHeader';
-import { API_BASE_URL } from '../config';
+import { fetchJson } from '../utils/api';
+import { formatCurrency } from '../utils/formatters';
 
 const initialMachineTypeForm = {
   machine_type_id: null,
@@ -13,31 +14,6 @@ const initialServiceForm = {
   service_description: '',
   service_id: null,
 };
-
-async function requestJson(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  });
-
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(payload.error || payload.errors?.join(', ') || 'Request failed');
-  }
-
-  return payload;
-}
-
-function formatCurrency(value) {
-  return new Intl.NumberFormat('en-GB', {
-    currency: 'GBP',
-    style: 'currency',
-  }).format(Number(value || 0));
-}
 
 function SettingsPage() {
   const [error, setError] = useState('');
@@ -56,8 +32,8 @@ function SettingsPage() {
 
     try {
       const [nextMachineTypes, nextServices] = await Promise.all([
-        requestJson('/machine-types'),
-        requestJson('/services'),
+        fetchJson('/machine-types'),
+        fetchJson('/services'),
       ]);
 
       const fallbackMachineTypeId =
@@ -127,13 +103,13 @@ function SettingsPage() {
 
     try {
       if (machineTypeForm.machine_type_id) {
-        await requestJson(`/machine-types/${machineTypeForm.machine_type_id}`, {
+        await fetchJson(`/machine-types/${machineTypeForm.machine_type_id}`, {
           body: JSON.stringify({ type_name: machineTypeForm.type_name }),
           method: 'PUT',
         });
         setFeedback('Machine type updated successfully.');
       } else {
-        const result = await requestJson('/machine-types', {
+        const result = await fetchJson('/machine-types', {
           body: JSON.stringify({ type_name: machineTypeForm.type_name }),
           method: 'POST',
         });
@@ -159,7 +135,7 @@ function SettingsPage() {
     setFeedback('');
 
     try {
-      await requestJson(`/machine-types/${machineTypeId}`, {
+      await fetchJson(`/machine-types/${machineTypeId}`, {
         method: 'DELETE',
       });
       setFeedback('Machine type deleted successfully.');
@@ -186,13 +162,13 @@ function SettingsPage() {
       };
 
       if (serviceForm.service_id) {
-        await requestJson(`/services/${serviceForm.service_id}`, {
+        await fetchJson(`/services/${serviceForm.service_id}`, {
           body: JSON.stringify(payload),
           method: 'PUT',
         });
         setFeedback('Service updated successfully.');
       } else {
-        await requestJson('/services', {
+        await fetchJson('/services', {
           body: JSON.stringify(payload),
           method: 'POST',
         });
@@ -217,7 +193,7 @@ function SettingsPage() {
     setFeedback('');
 
     try {
-      await requestJson(`/services/${serviceId}`, {
+      await fetchJson(`/services/${serviceId}`, {
         method: 'DELETE',
       });
       setFeedback('Service deleted successfully.');

@@ -3,27 +3,7 @@ import PageHeader from '../components/navigation/PageHeader';
 import InvoiceForm from '../components/invoices/InvoiceForm';
 import InvoiceDetailPage from '../components/invoices/InvoiceDetailPage';
 import InvoicesList from '../components/invoices/InvoicesList';
-import { API_BASE_URL } from '../config';
-
-
-async function requestJson(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  });
-
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const message = payload.error || payload.errors?.join(', ') || 'The request could not be completed.';
-    throw new Error(message);
-  }
-
-  return payload;
-}
+import { fetchJson } from '../utils/api';
 
 function InvoicesPage() {
   const [invoices, setInvoices] = useState([]);
@@ -53,10 +33,10 @@ function InvoicesPage() {
 
     try {
       const [invoicesData, customersData, jobsData, saleItemsData] = await Promise.all([
-        requestJson('/invoices'),
-        requestJson('/customers'),
-        requestJson('/repair-jobs'),
-        requestJson('/sale-items'),
+        fetchJson('/invoices'),
+        fetchJson('/customers'),
+        fetchJson('/repair-jobs'),
+        fetchJson('/sale-items'),
       ]);
 
       startTransition(() => {
@@ -100,13 +80,13 @@ function InvoicesPage() {
 
     try {
       if (formState.mode === 'create') {
-        await requestJson('/invoices', {
+        await fetchJson('/invoices', {
           body: JSON.stringify(formData),
           method: 'POST',
         });
         setActionMessage('Invoice created successfully.');
       } else {
-        await requestJson(`/invoices/${formState.invoice.invoice_no}`, {
+        await fetchJson(`/invoices/${formState.invoice.invoice_no}`, {
           body: JSON.stringify(formData),
           method: 'PUT',
         });
@@ -131,7 +111,7 @@ function InvoicesPage() {
     setActionMessage('');
 
     try {
-      await requestJson(`/invoices/${invoiceId}`, { method: 'DELETE' });
+      await fetchJson(`/invoices/${invoiceId}`, { method: 'DELETE' });
       setActionMessage('Invoice deleted successfully.');
       await loadData();
     } catch (deleteError) {

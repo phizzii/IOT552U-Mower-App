@@ -3,27 +3,7 @@ import PartsList from '../components/parts/PartsList';
 import PartForm from '../components/parts/PartForm';
 import PartDetailPage from '../components/parts/PartDetailPage';
 import PageHeader from '../components/navigation/PageHeader';
-import { API_BASE_URL } from '../config';
-
-
-async function requestJson(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  });
-
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const message = payload.error || payload.errors?.join(', ') || 'The request could not be completed.';
-    throw new Error(message);
-  }
-
-  return payload;
-}
+import { fetchJson } from '../utils/api';
 
 function PartsPage() {
   const [parts, setParts] = useState([]);
@@ -52,7 +32,7 @@ function PartsPage() {
     setError('');
 
     try {
-      const partsData = await requestJson('/parts');
+      const partsData = await fetchJson('/parts');
       startTransition(() => {
         setParts(partsData);
       });
@@ -104,7 +84,7 @@ function PartsPage() {
 
     try {
       if (formState.mode === 'create') {
-        await requestJson('/parts', {
+        await fetchJson('/parts', {
           body: JSON.stringify(formData),
           method: 'POST',
         });
@@ -113,7 +93,7 @@ function PartsPage() {
         setFormState({ isOpen: false, mode: 'create', part: null, isSubmitting: false });
         await loadData();
       } else {
-        await requestJson(`/parts/${formState.part.part_id}`, {
+        await fetchJson(`/parts/${formState.part.part_id}`, {
           body: JSON.stringify(formData),
           method: 'PUT',
         });
@@ -139,7 +119,7 @@ function PartsPage() {
     setActionMessage('');
 
     try {
-      await requestJson(`/parts/${partId}`, {
+      await fetchJson(`/parts/${partId}`, {
         method: 'DELETE',
       });
 

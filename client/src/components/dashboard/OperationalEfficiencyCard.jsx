@@ -1,13 +1,7 @@
 import DashboardSection from './DashboardSection';
+import { formatCurrency } from '../../utils/formatters';
 
 function OperationalEfficiencyCard({ repairTime, mechanicsPerformance, labourMetrics }) {
-  function formatCurrency(value) {
-    return new Intl.NumberFormat('en-GB', {
-      currency: 'GBP',
-      style: 'currency',
-    }).format(value || 0);
-  }
-
   return (
     <DashboardSection eyebrow="Productivity" title="Operational efficiency">
       <p className="section-copy">

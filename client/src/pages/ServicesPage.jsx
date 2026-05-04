@@ -3,27 +3,7 @@ import PageHeader from '../components/navigation/PageHeader';
 import ServicesList from '../components/services/ServicesList';
 import ServiceForm from '../components/services/ServiceForm';
 import ServiceDetailPage from '../components/services/ServiceDetailPage';
-import { API_BASE_URL } from '../config';
-
-
-async function requestJson(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  });
-
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const message = payload.error || payload.errors?.join(', ') || 'The request could not be completed.';
-    throw new Error(message);
-  }
-
-  return payload;
-}
+import { fetchJson } from '../utils/api';
 
 function ServicesPage() {
   const [services, setServices] = useState([]);
@@ -51,8 +31,8 @@ function ServicesPage() {
 
     try {
       const [servicesData, machineTypesData] = await Promise.all([
-        requestJson('/services'),
-        requestJson('/machine-types'),
+        fetchJson('/services'),
+        fetchJson('/machine-types'),
       ]);
 
       startTransition(() => {
@@ -94,13 +74,13 @@ function ServicesPage() {
 
     try {
       if (formState.mode === 'create') {
-        await requestJson('/services', {
+        await fetchJson('/services', {
           body: JSON.stringify(formData),
           method: 'POST',
         });
         setActionMessage('Service created successfully.');
       } else {
-        await requestJson(`/services/${formState.service.service_id}`, {
+        await fetchJson(`/services/${formState.service.service_id}`, {
           body: JSON.stringify(formData),
           method: 'PUT',
         });
@@ -124,7 +104,7 @@ function ServicesPage() {
     setActionMessage('');
 
     try {
-      await requestJson(`/services/${serviceId}`, { method: 'DELETE' });
+      await fetchJson(`/services/${serviceId}`, { method: 'DELETE' });
       setActionMessage('Service deleted successfully.');
       await loadData();
     } catch (deleteError) {

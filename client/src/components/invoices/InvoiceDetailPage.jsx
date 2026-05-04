@@ -1,25 +1,6 @@
 import { useEffect, useState } from 'react';
-import { API_BASE_URL } from '../../config';
-
-
-async function requestJson(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  });
-
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const message = payload.error || payload.errors?.join(', ') || 'The request could not be completed.';
-    throw new Error(message);
-  }
-
-  return payload;
-}
+import { fetchJson } from '../../utils/api';
+import { formatCurrency, formatDate } from '../../utils/formatters';
 
 function InvoiceDetailPage({ invoiceId, onClose, onEdit }) {
   const [invoice, setInvoice] = useState(null);
@@ -32,7 +13,7 @@ function InvoiceDetailPage({ invoiceId, onClose, onEdit }) {
       setError('');
 
       try {
-        const data = await requestJson(`/invoices/${invoiceId}`);
+        const data = await fetchJson(`/invoices/${invoiceId}`);
         setInvoice(data);
       } catch (loadError) {
         setError(loadError.message || 'Invoice could not be loaded.');
@@ -80,7 +61,7 @@ function InvoiceDetailPage({ invoiceId, onClose, onEdit }) {
                 <h4 className="section-title">Invoice Summary</h4>
                 <div className="detail-row">
                   <span>Amount</span>
-                  <span>£{Number(invoice.total_cost).toFixed(2)}</span>
+                  <span>{formatCurrency(invoice.total_cost)}</span>
                 </div>
                 <div className="detail-row">
                   <span>Payment type</span>
@@ -88,7 +69,7 @@ function InvoiceDetailPage({ invoiceId, onClose, onEdit }) {
                 </div>
                 <div className="detail-row">
                   <span>Date paid</span>
-                  <span>{invoice.date_paid || 'Pending'}</span>
+                  <span>{invoice.date_paid ? formatDate(invoice.date_paid) : 'Pending'}</span>
                 </div>
               </div>
 

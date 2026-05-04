@@ -5,8 +5,8 @@ const {
   all,
   asyncHandler,
   getOne,
-  normalizeText,
   parseNumber,
+  parseText,
   run,
   sendValidationErrors,
   validateIdParam,
@@ -17,14 +17,16 @@ function getPartPayload(body) {
 
   return {
     errors,
-    part_description: normalizeText(body.part_description),
+    part_description: parseText(body.part_description, 'part_description', errors, {
+      required: true,
+    }),
     retail_price: parseNumber(body.retail_price, 'retail_price', errors, {
       min: 0,
     }),
     supplier_cost: parseNumber(body.supplier_cost, 'supplier_cost', errors, {
       min: 0,
     }),
-    supplier_name: normalizeText(body.supplier_name),
+    supplier_name: parseText(body.supplier_name, 'supplier_name', errors),
   };
 }
 

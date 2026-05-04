@@ -1,13 +1,7 @@
 import DashboardSection from './DashboardSection';
+import { formatCurrency } from '../../utils/formatters';
 
 function CustomerValueCard({ topCustomers }) {
-  function formatCurrency(value) {
-    return new Intl.NumberFormat('en-GB', {
-      currency: 'GBP',
-      style: 'currency',
-    }).format(value || 0);
-  }
-
   return (
     <DashboardSection eyebrow="Customer Analysis" title="Top customers by lifetime value">
       <p className="section-copy">

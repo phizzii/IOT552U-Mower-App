@@ -5,29 +5,11 @@ import RecentActivityCard from '../components/dashboard/RecentActivityCard';
 import RevenueTrendCard from '../components/dashboard/RevenueTrendCard';
 import StatusBreakdownCard from '../components/dashboard/StatusBreakdownCard';
 import PageHeader from '../components/navigation/PageHeader';
-import { API_BASE_URL } from '../config';
-
-
-function formatCurrency(value) {
-  return new Intl.NumberFormat('en-GB', {
-    currency: 'GBP',
-    style: 'currency',
-  }).format(value);
-}
+import { fetchJson } from '../utils/api';
+import { formatCurrency, formatShortDate } from '../utils/formatters';
 
 function normalizeStatus(status) {
   return status || 'Unspecified';
-}
-
-function toDateLabel(value) {
-  if (!value) {
-    return 'No date';
-  }
-
-  return new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: 'short',
-  }).format(new Date(`${value}T00:00:00`));
 }
 
 function buildDashboardModel({ deliveries, invoices, jobs, lineItems }) {
@@ -69,7 +51,7 @@ function buildDashboardModel({ deliveries, invoices, jobs, lineItems }) {
   }));
 
   const recentJobs = jobs.map((job) => ({
-    dateLabel: toDateLabel(job.date_logged || job.date_return),
+    dateLabel: formatShortDate(job.date_logged || job.date_return),
     detail: `${job.customer_first_name || 'Customer'} ${job.customer_last_name || ''}`.trim(),
     id: job.job_no,
     kind: 'job',
@@ -82,7 +64,7 @@ function buildDashboardModel({ deliveries, invoices, jobs, lineItems }) {
   const recentInvoices = invoices
     .filter((invoice) => invoice.date_paid)
     .map((invoice) => ({
-      dateLabel: toDateLabel(invoice.date_paid),
+      dateLabel: formatShortDate(invoice.date_paid),
       detail: `${invoice.customer_first_name || 'Customer'} ${invoice.customer_last_name || ''}`.trim(),
       id: invoice.invoice_no,
       kind: 'invoice',
@@ -129,8 +111,8 @@ function buildDashboardModel({ deliveries, invoices, jobs, lineItems }) {
         badge: `${deliveryCount} routes`,
         copy:
           deliveryCount > 0
-            ? 'Delivery data exists and is ready to become a stronger logistics view in the next phase.'
-            : 'No delivery records are available yet, so the logistics view can stay lightweight.',
+            ? 'Delivery records are available for route and cost tracking.'
+            : 'No delivery records are currently stored.',
         title: 'Delivery planning',
         tone: deliveryCount > 0 ? 'forest' : 'ink',
       },
@@ -182,22 +164,12 @@ function DashboardPage() {
       setError('');
 
       try {
-        const responses = await Promise.all([
-          fetch(`${API_BASE_URL}/repair-jobs`),
-          fetch(`${API_BASE_URL}/invoices`),
-          fetch(`${API_BASE_URL}/deliveries`),
-          fetch(`${API_BASE_URL}/job-line-items`),
+        const [jobs, invoices, deliveries, lineItems] = await Promise.all([
+          fetchJson('/repair-jobs'),
+          fetchJson('/invoices'),
+          fetchJson('/deliveries'),
+          fetchJson('/job-line-items'),
         ]);
-
-        responses.forEach((response) => {
-          if (!response.ok) {
-            throw new Error('Dashboard data could not be loaded from the API.');
-          }
-        });
-
-        const [jobs, invoices, deliveries, lineItems] = await Promise.all(
-          responses.map((response) => response.json())
-        );
 
         if (!isActive) {
           return;
@@ -237,8 +209,8 @@ function DashboardPage() {
     return (
       <div className="placeholder-page dashboard-page">
         <PageHeader
-          eyebrow="Part 2 · Live Dashboard"
-          summary="Loading the live operational snapshot from your current API so this page reflects the real backend shape."
+          eyebrow="Workshop Overview"
+          summary="Loading the latest workshop activity, billing status, and delivery highlights."
           title="Dashboard"
         />
 
@@ -255,8 +227,8 @@ function DashboardPage() {
     return (
       <div className="placeholder-page dashboard-page">
         <PageHeader
-          eyebrow="Part 2 · Live Dashboard"
-          summary="The shell is working, but the dashboard could not reach the backend data it expects. This usually means the server is not running, or the seed data has not been loaded yet."
+          eyebrow="Workshop Overview"
+          summary="The dashboard could not load its operational data."
           title="Dashboard"
         />
 
@@ -274,8 +246,8 @@ function DashboardPage() {
   return (
     <div className="placeholder-page dashboard-page">
       <PageHeader
-        eyebrow="Part 2 · Live Dashboard"
-        summary="This first real frontend screen now reads from the backend and gives the repair business an operational snapshot instead of a placeholder route."
+        eyebrow="Workshop Overview"
+        summary="Track active jobs, billing follow-up, recent activity, and delivery signals from one operational snapshot."
         title="Dashboard"
       />
 
