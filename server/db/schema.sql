@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS Repair_Job (
   instruction TEXT,
   notes TEXT,
   status TEXT,
+  assigned_mechanic TEXT,
   date_finished TEXT,
   contact_method TEXT,
   date_return TEXT,

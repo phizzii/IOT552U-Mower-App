@@ -80,13 +80,14 @@ INSERT INTO Repair_Job (
   instruction,
   notes,
   status,
+  assigned_mechanic,
   date_finished,
   contact_method,
   date_return
 ) VALUES
-  (1, 1, 1, '2026-04-10', NULL, 'Customer requested standard service before summer use', 'Machine starts but runs rough after 10 minutes', 'In Progress', NULL, 'Phone', '2026-04-22'),
-  (2, 2, 2, '2026-04-11', NULL, 'Replace damaged drive shaft and inspect deck', 'Customer reported loud knocking when engaging drive', 'Awaiting Parts', NULL, 'Email', NULL),
-  (3, 3, 3, '2026-04-12', '2026-04-16', 'Service and return to customer', 'Completed same week', 'Collected', '2026-04-15', 'Phone', '2026-04-16');
+  (1, 1, 1, '2026-04-10', NULL, 'Customer requested standard service before summer use', 'Machine starts but runs rough after 10 minutes', 'In Progress', 'Lewis Hart', NULL, 'Phone', '2026-04-22'),
+  (2, 2, 2, '2026-04-11', NULL, 'Replace damaged drive shaft and inspect deck', 'Customer reported loud knocking when engaging drive', 'Awaiting Parts', 'Nina Patel', NULL, 'Email', NULL),
+  (3, 3, 3, '2026-04-12', '2026-04-16', 'Service and return to customer', 'Completed same week', 'Collected', 'Mason Reed', '2026-04-15', 'Phone', '2026-04-16');
 
 INSERT INTO Job_Line_Item (
   line_item_id,

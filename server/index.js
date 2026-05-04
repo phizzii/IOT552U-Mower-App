@@ -1,9 +1,10 @@
-require('dotenv').config();
+const { PORT } = require('./config');
 
 const express = require('express');
 const cors = require('cors');
 
 const db = require('./db/db');
+const analyticsRouter = require('./routes/analytics');
 const customersRouter = require('./routes/customers');
 const deliveriesRouter = require('./routes/deliveries');
 const invoicesRouter = require('./routes/invoices');
@@ -25,6 +26,7 @@ app.get('/', (req, res) => {
   res.send('API running');
 });
 
+app.use('/api/analytics', analyticsRouter);
 app.use('/api/customers', customersRouter);
 app.use('/api/deliveries', deliveriesRouter);
 app.use('/api/invoices', invoicesRouter);
@@ -37,7 +39,6 @@ app.use('/api/repair-jobs', repairJobsRouter);
 app.use('/api/sale-items', saleItemsRouter);
 app.use('/api/services', servicesRouter);
 
-const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

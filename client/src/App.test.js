@@ -1,8 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+jest.mock('./pages/DeliveriesPage', () => function MockDeliveriesPage() {
+  return <div>Deliveries Page</div>;
+});
+
+test('renders dashboard shell heading', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const shellMarker = screen.getByText(/Workshop Live/i);
+  expect(shellMarker).toBeInTheDocument();
 });
