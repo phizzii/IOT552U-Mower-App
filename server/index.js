@@ -1,4 +1,4 @@
-require('dotenv').config();
+const { PORT } = require('./config');
 
 const express = require('express');
 const cors = require('cors');
@@ -37,7 +37,6 @@ app.use('/api/repair-jobs', repairJobsRouter);
 app.use('/api/sale-items', saleItemsRouter);
 app.use('/api/services', servicesRouter);
 
-const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

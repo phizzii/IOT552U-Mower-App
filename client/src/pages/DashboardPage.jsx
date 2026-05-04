@@ -5,8 +5,8 @@ import RecentActivityCard from '../components/dashboard/RecentActivityCard';
 import RevenueTrendCard from '../components/dashboard/RevenueTrendCard';
 import StatusBreakdownCard from '../components/dashboard/StatusBreakdownCard';
 import PageHeader from '../components/navigation/PageHeader';
+import { API_BASE_URL } from '../config';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001/api';
 
 function formatCurrency(value) {
   return new Intl.NumberFormat('en-GB', {
