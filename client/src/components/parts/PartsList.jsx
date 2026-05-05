@@ -1,6 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import ExpandableRecord from '../shared/ExpandableRecord';
 
 function PartsList({ onDelete, onEdit, onView, parts }) {
+  const [openPartId, setOpenPartId] = useState(null);
   const filteredParts = useMemo(() => {
     return parts;
   }, [parts]);
@@ -25,15 +27,11 @@ function PartsList({ onDelete, onEdit, onView, parts }) {
           </p>
         </div>
       ) : (
-        <div className="parts-grid">
+        <div className="record-list">
           {filteredParts.map((part) => (
-            <div className="part-card" key={part.part_id}>
-              <div className="card-header">
-                <div className="part-info">
-                  <h4 className="part-name">{part.part_description}</h4>
-                  <div className="supplier-info">{part.supplier_name}</div>
-                </div>
-                <div className="card-actions">
+            <ExpandableRecord
+              actions={
+                <>
                   <button
                     aria-label={`View ${part.part_description}`}
                     className="icon-button"
@@ -65,26 +63,42 @@ function PartsList({ onDelete, onEdit, onView, parts }) {
                   >
                     ×
                   </button>
+                </>
+              }
+              isOpen={openPartId === part.part_id}
+              key={part.part_id}
+              onToggle={() =>
+                setOpenPartId((current) => (current === part.part_id ? null : part.part_id))
+              }
+              subtitle={[part.brand, part.supplier_name].filter(Boolean).join(' · ') || 'No supplier'}
+              summary={`£${Number(part.retail_price).toFixed(2)}`}
+              title={part.part_description}
+            >
+              <div className="record-detail-grid">
+                <div className="record-detail-item">
+                  <span className="record-detail-label">Brand</span>
+                  <strong>{part.brand || 'Not set'}</strong>
+                </div>
+                <div className="record-detail-item">
+                  <span className="record-detail-label">Supplier cost</span>
+                  <strong>£{Number(part.supplier_cost).toFixed(2)}</strong>
+                </div>
+                <div className="record-detail-item">
+                  <span className="record-detail-label">Retail price</span>
+                  <strong>£{Number(part.retail_price).toFixed(2)}</strong>
+                </div>
+                <div className="record-detail-item">
+                  <span className="record-detail-label">Margin</span>
+                  <strong>
+                    £{(part.retail_price - part.supplier_cost).toFixed(2)} (
+                    {Number(part.supplier_cost) > 0
+                      ? `${(((part.retail_price - part.supplier_cost) / part.supplier_cost) * 100).toFixed(0)}%`
+                      : 'N/A'}
+                    )
+                  </strong>
                 </div>
               </div>
-
-              <div className="card-body">
-                <div className="pricing-row">
-                  <span className="label">Supplier Cost</span>
-                  <span className="value">£{part.supplier_cost.toFixed(2)}</span>
-                </div>
-                <div className="pricing-row">
-                  <span className="label">Retail Price</span>
-                  <span className="value">£{part.retail_price.toFixed(2)}</span>
-                </div>
-                <div className="pricing-row">
-                  <span className="label">Margin</span>
-                  <span className="value">
-                    £{(part.retail_price - part.supplier_cost).toFixed(2)} ({(((part.retail_price - part.supplier_cost) / part.supplier_cost) * 100).toFixed(0)}%)
-                  </span>
-                </div>
-              </div>
-            </div>
+            </ExpandableRecord>
           ))}
         </div>
       )}

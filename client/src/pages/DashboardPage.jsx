@@ -2,7 +2,6 @@ import { startTransition, useEffect, useState } from 'react';
 import AlertsCard from '../components/dashboard/AlertsCard';
 import DashboardKpiCard from '../components/dashboard/DashboardKpiCard';
 import RecentActivityCard from '../components/dashboard/RecentActivityCard';
-import RevenueTrendCard from '../components/dashboard/RevenueTrendCard';
 import StatusBreakdownCard from '../components/dashboard/StatusBreakdownCard';
 import PageHeader from '../components/navigation/PageHeader';
 import { fetchJson } from '../utils/api';
@@ -14,17 +13,10 @@ function normalizeStatus(status) {
 
 function buildDashboardModel({ deliveries, invoices, jobs, lineItems }) {
   const today = new Date().toISOString().slice(0, 10);
-  const completedToday = jobs.filter(
-    (job) => job.date_finished === today || job.date_collected === today
-  ).length;
   const activeJobs = jobs.filter(
     (job) => !['Collected', 'Completed'].includes(normalizeStatus(job.status))
   ).length;
   const outstandingInvoices = invoices.filter((invoice) => !invoice.date_paid).length;
-  const totalInvoiceValue = invoices.reduce(
-    (sum, invoice) => sum + Number(invoice.total_cost || 0),
-    0
-  );
 
   const statusMap = jobs.reduce((accumulator, job) => {
     const label = normalizeStatus(job.status);
@@ -43,12 +35,6 @@ function buildDashboardModel({ deliveries, invoices, jobs, lineItems }) {
   }, {});
 
   const topService = Object.entries(serviceUsage).sort((left, right) => right[1] - left[1])[0]?.[0];
-
-  const revenuePoints = invoices.slice(-5).map((invoice) => ({
-    formattedValue: formatCurrency(Number(invoice.total_cost || 0)),
-    label: `INV ${invoice.invoice_no}`,
-    value: Number(invoice.total_cost || 0),
-  }));
 
   const recentJobs = jobs.map((job) => ({
     dateLabel: formatShortDate(job.date_logged || job.date_return),
@@ -119,35 +105,19 @@ function buildDashboardModel({ deliveries, invoices, jobs, lineItems }) {
     ],
     kpis: [
       {
-        detail: 'Jobs still moving through the workshop flow.',
         label: 'Active Jobs',
         tone: 'forest',
         value: activeJobs,
       },
       {
-        detail: 'Jobs finished or collected today.',
-        label: 'Completed Today',
-        tone: 'amber',
-        value: completedToday,
-      },
-      {
-        detail: 'Invoices still missing a payment date.',
         label: 'Outstanding Invoices',
         tone: 'ink',
         value: outstandingInvoices,
       },
-      {
-        detail: 'Total invoiced value across current records.',
-        label: 'Invoice Value',
-        tone: 'sage',
-        value: formatCurrency(totalInvoiceValue),
-      },
     ],
     recentActivity,
-    revenuePoints,
     statusItems,
     topService,
-    totalInvoiceValue: formatCurrency(totalInvoiceValue),
   };
 }
 
@@ -211,7 +181,7 @@ function DashboardPage() {
         <PageHeader eyebrow="Workshop Overview" title="Dashboard" />
 
         <div className="dashboard-kpi-grid">
-          {['A', 'B', 'C', 'D'].map((item) => (
+          {['A', 'B'].map((item) => (
             <div className="surface-card dashboard-loading-card" key={item} />
           ))}
         </div>
@@ -256,10 +226,6 @@ function DashboardPage() {
           <StatusBreakdownCard
             items={dashboardData.statusItems}
             topService={dashboardData.topService}
-          />
-          <RevenueTrendCard
-            points={dashboardData.revenuePoints}
-            totalValue={dashboardData.totalInvoiceValue}
           />
         </div>
 

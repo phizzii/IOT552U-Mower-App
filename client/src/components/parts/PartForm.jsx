@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 function createInitialState(part = null) {
   return {
+    brand: part?.brand || '',
     part_description: part?.part_description || '',
     supplier_name: part?.supplier_name || '',
     supplier_cost: part?.supplier_cost || '',
@@ -156,6 +157,21 @@ function PartForm({
                 <div className="field-error">{fieldErrors.supplier_name}</div>
               )}
             </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="brand">
+                Brand / Manufacturer
+              </label>
+              <input
+                className="form-input"
+                id="brand"
+                name="brand"
+                onChange={handleInputChange}
+                placeholder="e.g. Honda, NGK, Stihl"
+                type="text"
+                value={formData.brand}
+              />
+            </div>
           </div>
 
           <div className="form-section">
@@ -212,7 +228,9 @@ function PartForm({
                 <div className="preview-item">
                   <span className="preview-label">Margin %:</span>
                   <span className="preview-value">
-                    {(((parseFloat(formData.retail_price) - parseFloat(formData.supplier_cost)) / parseFloat(formData.supplier_cost)) * 100).toFixed(0)}%
+                    {parseFloat(formData.supplier_cost) > 0
+                      ? `${(((parseFloat(formData.retail_price) - parseFloat(formData.supplier_cost)) / parseFloat(formData.supplier_cost)) * 100).toFixed(0)}%`
+                      : 'N/A'}
                   </span>
                 </div>
               </div>

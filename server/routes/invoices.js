@@ -12,6 +12,7 @@ const {
   run,
   sendValidationErrors,
   validateIdParam,
+  withTransaction,
 } = require('../utils/routeHelpers');
 
 function getInvoicePayload(body) {
@@ -186,8 +187,10 @@ router.delete(
       return;
     }
 
-    const sql = 'DELETE FROM Invoice WHERE invoice_no = ?';
-    const result = await run(db, sql, [id]);
+    const result = await withTransaction(db, async () => {
+      await run(db, 'DELETE FROM Delivery WHERE invoice_no = ?', [id]);
+      return run(db, 'DELETE FROM Invoice WHERE invoice_no = ?', [id]);
+    });
 
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Invoice not found' });

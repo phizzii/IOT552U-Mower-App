@@ -11,6 +11,7 @@ const {
   run,
   sendValidationErrors,
   validateIdParam,
+  withTransaction,
 } = require('../utils/routeHelpers');
 
 function getRepairJobPayload(body) {
@@ -205,8 +206,18 @@ router.delete(
       return;
     }
 
-    const sql = 'DELETE FROM Repair_Job WHERE job_no = ?';
-    const result = await run(db, sql, [id]);
+    const result = await withTransaction(db, async () => {
+      const invoices = await all(db, 'SELECT invoice_no FROM Invoice WHERE job_no = ?', [id]);
+
+      for (const invoice of invoices) {
+        await run(db, 'DELETE FROM Delivery WHERE invoice_no = ?', [invoice.invoice_no]);
+      }
+
+      await run(db, 'DELETE FROM Invoice WHERE job_no = ?', [id]);
+      await run(db, 'DELETE FROM Job_Line_Item WHERE job_id = ?', [id]);
+      await run(db, 'DELETE FROM Job_Part WHERE job_no = ?', [id]);
+      return run(db, 'DELETE FROM Repair_Job WHERE job_no = ?', [id]);
+    });
 
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Repair job not found' });

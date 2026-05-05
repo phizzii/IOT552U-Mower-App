@@ -49,14 +49,15 @@ INSERT INTO Service (
 INSERT INTO Part (
   part_id,
   part_description,
+  brand,
   supplier_name,
   supplier_cost,
   retail_price
 ) VALUES
-  (1, 'Drive shaft assembly', 'GreenField Parts Ltd', 42.50, 68.00),
-  (2, 'Spark plug', 'MowerTech Supplies', 3.20, 7.50),
-  (3, 'Blade set', 'CutRight Wholesale', 18.00, 32.00),
-  (4, 'Air filter', 'MowerTech Supplies', 4.10, 9.00);
+  (1, 'Drive shaft assembly', 'Honda', 'GreenField Parts Ltd', 42.50, 68.00),
+  (2, 'Spark plug', 'NGK', 'MowerTech Supplies', 3.20, 7.50),
+  (3, 'Blade set', 'John Deere', 'CutRight Wholesale', 18.00, 32.00),
+  (4, 'Air filter', 'Stihl', 'MowerTech Supplies', 4.10, 9.00);
 
 INSERT INTO Machine (
   machine_id,

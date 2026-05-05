@@ -42,28 +42,26 @@ function PartsPage() {
       {actionError ? <div className="feedback-banner error">{actionError}</div> : null}
       {actionMessage ? <div className="feedback-banner success">{actionMessage}</div> : null}
 
-      <div className="page-grid">
-        <div className="page-stack">
-          <ModuleActionCard
-            actionLabel="+ New Part"
-            onAction={openCreate}
-            sectionLabel="Inventory"
-            title="Part Records"
-          />
+      <div className="page-stack page-stack--wide">
+        <ModuleActionCard
+          actionLabel="+ New Part"
+          onAction={openCreate}
+          sectionLabel="Inventory"
+          title="Part Records"
+        />
 
-          {isLoading ? (
-            <div className="surface-card">
-              <div className="loading-state">Loading parts...</div>
-            </div>
-          ) : (
-            <PartsList
-              onDelete={deleteItem}
-              onEdit={openEdit}
-              onView={openDetail}
-              parts={parts}
-            />
-          )}
-        </div>
+        {isLoading ? (
+          <div className="surface-card">
+            <div className="loading-state">Loading parts...</div>
+          </div>
+        ) : (
+          <PartsList
+            onDelete={deleteItem}
+            onEdit={openEdit}
+            onView={openDetail}
+            parts={parts}
+          />
+        )}
       </div>
 
       <PartForm

@@ -11,8 +11,8 @@
   --accent: #305c47;
   --accent-strong: #173e30;
   --accent-glow: rgba(54, 101, 75, 0.2);
-  --highlight: #bf7b2f;
-  --highlight-soft: rgba(191, 123, 47, 0.16);
+  --highlight: #5f8f68;
+  --highlight-soft: rgba(95, 143, 104, 0.16);
   --danger-soft: #f7d9d5;
   --success-soft: #dceedd;
   --radius-xl: 30px;
@@ -29,7 +29,7 @@
 
 body {
   background:
-    radial-gradient(circle at top left, rgba(191, 123, 47, 0.14), transparent 32%),
+    radial-gradient(circle at top left, rgba(95, 143, 104, 0.12), transparent 32%),
     radial-gradient(circle at top right, rgba(48, 92, 71, 0.14), transparent 28%),
     linear-gradient(160deg, var(--page-bg) 0%, #f7f2e9 50%, var(--page-bg-soft) 100%);
   color: var(--ink);
@@ -92,7 +92,7 @@ textarea {
 .brand-seal {
   align-items: center;
   background:
-    linear-gradient(135deg, rgba(191, 123, 47, 0.95), rgba(244, 208, 161, 0.88));
+    linear-gradient(135deg, rgba(48, 92, 71, 0.96), rgba(95, 143, 104, 0.9));
   border-radius: 18px;
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35);
   color: #143326;
@@ -162,7 +162,7 @@ textarea {
   color: var(--ink);
   display: grid;
   gap: 10px;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr;
   min-width: 0;
   padding: 12px 14px;
   position: relative;
@@ -304,7 +304,7 @@ textarea {
 
 .utility-chip {
   background: var(--highlight-soft);
-  color: #8a5316;
+  color: var(--accent-strong);
 }
 
 .utility-chip::before,
@@ -320,7 +320,7 @@ textarea {
 }
 
 .utility-chip::before {
-  background: #bf7b2f;
+  background: var(--highlight);
 }
 
 .shell-content {
@@ -349,7 +349,7 @@ textarea {
 
 .page-header::after {
   background:
-    radial-gradient(circle at top right, rgba(191, 123, 47, 0.2), transparent 40%),
+    radial-gradient(circle at top right, rgba(95, 143, 104, 0.18), transparent 40%),
     radial-gradient(circle at bottom left, rgba(48, 92, 71, 0.16), transparent 42%);
   content: '';
   inset: 0;
@@ -396,6 +396,15 @@ textarea {
 .page-stack {
   display: grid;
   gap: 18px;
+}
+
+.page-wrapper {
+  display: grid;
+  gap: 18px;
+}
+
+.page-stack--wide {
+  width: 100%;
 }
 
 .surface-card {
@@ -493,7 +502,7 @@ textarea {
 }
 
 .list-bullet {
-  background: linear-gradient(180deg, var(--highlight), #ebb775);
+  background: linear-gradient(180deg, var(--highlight), var(--accent));
   border-radius: 999px;
   height: 10px;
   margin-top: 8px;
@@ -594,7 +603,7 @@ textarea {
 }
 
 .dashboard-kpi-card.tone-amber::after {
-  background: radial-gradient(circle, rgba(191, 123, 47, 0.22), transparent 65%);
+  background: radial-gradient(circle, rgba(95, 143, 104, 0.2), transparent 65%);
 }
 
 .dashboard-kpi-card.tone-ink::after {
@@ -676,7 +685,7 @@ textarea {
 }
 
 .dashboard-status-bar.highlight {
-  background: linear-gradient(90deg, var(--highlight), #d9941d);
+  background: linear-gradient(90deg, var(--highlight), var(--accent));
 }
 
 .dashboard-inline-note {
@@ -773,7 +782,7 @@ textarea {
 }
 
 .dashboard-activity-dot.tone-amber {
-  background: #bf7b2f;
+  background: var(--highlight);
 }
 
 .dashboard-activity-dot.tone-sage {
@@ -816,8 +825,8 @@ textarea {
 }
 
 .dashboard-alert.tone-amber {
-  background: #fff5e6;
-  border-color: rgba(191, 123, 47, 0.18);
+  background: rgba(95, 143, 104, 0.08);
+  border-color: rgba(95, 143, 104, 0.18);
 }
 
 .dashboard-alert.tone-forest {
@@ -966,7 +975,7 @@ textarea {
 }
 
 .settings-service-form {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .jobs-workspace {
@@ -976,10 +985,15 @@ textarea {
   grid-template-columns: minmax(360px, 0.92fr) minmax(620px, 1.08fr);
 }
 
-.jobs-primary-column,
-.job-detail-column {
+.jobs-primary-column {
+  align-self: stretch;
   display: grid;
   gap: 18px;
+  grid-template-rows: auto minmax(540px, 1fr);
+}
+
+.job-detail-column {
+  display: contents;
 }
 
 .jobs-panel-title {
@@ -1122,6 +1136,11 @@ textarea {
   gap: 18px;
 }
 
+.jobs-table-card {
+  align-content: start;
+  min-height: 100%;
+}
+
 .jobs-table-header,
 .job-detail-header,
 .job-subsection-header {
@@ -1238,7 +1257,14 @@ textarea {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.job-detail-stack {
+  align-content: start;
+  display: grid;
+  gap: 16px;
+}
+
 .detail-block {
+  align-content: start;
   background: rgba(255, 255, 255, 0.56);
   border: 1px solid rgba(48, 92, 71, 0.09);
   border-radius: 22px;
@@ -1291,6 +1317,11 @@ textarea {
   display: grid;
   gap: 18px;
   grid-template-columns: 1fr;
+  grid-column: 2;
+}
+
+.job-detail-column > .job-detail-card {
+  grid-column: 1 / -1;
 }
 
 .stack-list,
@@ -1319,21 +1350,371 @@ textarea {
   line-height: 1.5;
 }
 
+.record-list {
+  display: grid;
+  gap: 14px;
+}
+
+.record-card {
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(48, 92, 71, 0.1);
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.record-card.is-open {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(48, 92, 71, 0.18);
+  box-shadow: 0 18px 34px rgba(36, 44, 35, 0.08);
+}
+
+.record-card-bar {
+  align-items: start;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 12px 14px;
+}
+
+.record-card-toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1.2fr) auto auto;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.record-card-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.record-card-title {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.record-card-subtitle,
+.record-card-summary {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.record-card-summary {
+  justify-self: end;
+  text-align: right;
+}
+
+.record-card-chevron {
+  align-items: center;
+  background: rgba(48, 92, 71, 0.08);
+  border-radius: 999px;
+  color: var(--accent-strong);
+  display: inline-flex;
+  font-size: 1rem;
+  font-weight: 700;
+  height: 32px;
+  justify-content: center;
+  width: 32px;
+}
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.record-card-actions {
+  align-self: start;
+  justify-content: flex-end;
+}
+
+.icon-button {
+  align-items: center;
+  background: rgba(48, 92, 71, 0.08);
+  border: 1px solid rgba(48, 92, 71, 0.1);
+  border-radius: 12px;
+  color: var(--accent-strong);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.95rem;
+  font-weight: 700;
+  height: 34px;
+  justify-content: center;
+  transition: background-color 180ms ease, transform 180ms ease;
+  width: 34px;
+}
+
+.icon-button:hover {
+  background: rgba(48, 92, 71, 0.14);
+  transform: translateY(-1px);
+}
+
+.icon-button.danger {
+  color: #8f3f2b;
+}
+
+.form-overlay,
+.detail-overlay {
+  align-items: center;
+  display: grid;
+  inset: 0;
+  justify-items: center;
+  padding: 24px;
+  position: fixed;
+  z-index: 30;
+}
+
+.form-backdrop,
+.detail-backdrop {
+  background: rgba(20, 25, 21, 0.48);
+  border: 0;
+  cursor: pointer;
+  inset: 0;
+  position: absolute;
+}
+
+.form-panel,
+.detail-panel {
+  background: linear-gradient(180deg, rgba(252, 248, 241, 0.98), rgba(247, 242, 233, 0.97));
+  border: 1px solid rgba(48, 92, 71, 0.12);
+  border-radius: 28px;
+  box-shadow: 0 36px 90px rgba(18, 26, 21, 0.22);
+  display: grid;
+  gap: 18px;
+  max-height: min(88vh, 900px);
+  overflow-y: auto;
+  padding: 24px;
+  position: relative;
+  width: min(100%, 840px);
+  z-index: 1;
+}
+
+.detail-panel.detail-large {
+  width: min(100%, 1080px);
+}
+
+.form-header,
+.detail-header {
+  align-items: start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.form-title {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  margin: 0;
+}
+
+.form-body,
+.detail-body {
+  display: grid;
+  gap: 18px;
+}
+
+.form-section,
+.detail-section {
+  display: grid;
+  gap: 14px;
+}
+
+.form-section-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.field-row,
+.form-row,
+.detail-grid,
+.detail-rows,
+.stat-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.field-row,
+.form-row,
+.detail-grid,
+.stat-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.form-group {
+  display: grid;
+  gap: 8px;
+}
+
+.form-label {
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.form-input {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(48, 92, 71, 0.14);
+  border-radius: 16px;
+  color: var(--ink);
+  min-height: 48px;
+  padding: 12px 14px;
+  width: 100%;
+}
+
+.form-input:focus {
+  border-color: rgba(48, 92, 71, 0.42);
+  box-shadow: 0 0 0 4px rgba(48, 92, 71, 0.1);
+  outline: none;
+}
+
+.form-input.error,
+.field-control.error {
+  border-color: rgba(171, 76, 54, 0.32);
+}
+
+.field-error {
+  color: #8f3f2b;
+  font-size: 0.86rem;
+}
+
+.form-footer,
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.close-button {
+  align-items: center;
+  background: rgba(48, 92, 71, 0.08);
+  border: 1px solid rgba(48, 92, 71, 0.1);
+  border-radius: 12px;
+  color: var(--accent-strong);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 1rem;
+  height: 36px;
+  justify-content: center;
+  width: 36px;
+}
+
+.pricing-preview {
+  background: rgba(48, 92, 71, 0.05);
+  border: 1px solid rgba(48, 92, 71, 0.08);
+  border-radius: 16px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 14px 16px;
+}
+
+.preview-item {
+  display: grid;
+  gap: 4px;
+}
+
+.preview-label {
+  color: var(--ink-faint);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.detail-row,
+.detail-rows .detail-row {
+  align-items: start;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
+}
+
+.detail-row .label,
+.stat-label {
+  color: var(--ink-faint);
+}
+
+.detail-row .value {
+  word-break: break-word;
+}
+
+.stat-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.stat-item {
+  background: rgba(48, 92, 71, 0.05);
+  border: 1px solid rgba(48, 92, 71, 0.08);
+  border-radius: 16px;
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.record-card-body {
+  border-top: 1px solid rgba(48, 92, 71, 0.08);
+  padding: 0 14px 14px;
+}
+
+.record-detail-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  padding-top: 14px;
+}
+
+.record-detail-item {
+  background: rgba(48, 92, 71, 0.05);
+  border: 1px solid rgba(48, 92, 71, 0.08);
+  border-radius: 16px;
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+}
+
+.record-detail-item--wide {
+  grid-column: span 2;
+}
+
+.record-detail-label {
+  color: var(--ink-faint);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .inline-form,
 .wizard-field-grid {
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 .parts-form {
   align-items: end;
-  grid-template-columns: minmax(0, 1.8fr) minmax(90px, 0.7fr) minmax(120px, 0.9fr) auto;
+  grid-template-columns: minmax(220px, 1.8fr) minmax(110px, 0.7fr) minmax(140px, 0.9fr) auto;
 }
 
 .service-form {
   align-items: end;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
 }
 
 .field-span-2 {
@@ -1575,6 +1956,11 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .job-subgrid,
+  .job-detail-column > .job-detail-card {
+    grid-column: 1;
+  }
+
   .jobs-filter-grid,
   .inline-form,
   .parts-form,
@@ -1582,8 +1968,13 @@ textarea {
   .settings-service-form,
   .wizard-field-grid,
   .wizard-steps,
-  .summary-metric-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .summary-metric-row,
+  .field-row,
+  .form-row,
+  .detail-grid,
+  .stat-grid,
+  .record-detail-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
 
   .dashboard-grid {
@@ -1628,8 +2019,43 @@ textarea {
   .settings-service-form,
   .wizard-field-grid,
   .wizard-steps,
-  .summary-metric-row {
+  .summary-metric-row,
+  .field-row,
+  .form-row,
+  .detail-grid,
+  .stat-grid,
+  .record-detail-grid {
     grid-template-columns: 1fr;
+  }
+
+  .record-card-bar,
+  .record-card-toggle,
+  .detail-row,
+  .detail-rows .detail-row {
+    grid-template-columns: 1fr;
+  }
+
+  .jobs-filter-actions,
+  .form-footer,
+  .detail-actions,
+  .status-update-row {
+    width: 100%;
+  }
+
+  .jobs-filter-actions > *,
+  .form-footer > *,
+  .detail-actions > *,
+  .status-update-row > * {
+    flex: 1 1 100%;
+  }
+
+  .record-card-summary {
+    justify-self: start;
+    text-align: left;
+  }
+
+  .record-detail-item--wide {
+    grid-column: auto;
   }
 
   .wizard-panel {

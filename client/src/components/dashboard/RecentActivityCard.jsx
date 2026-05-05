@@ -2,7 +2,7 @@ import DashboardSection from './DashboardSection';
 
 function RecentActivityCard({ items }) {
   return (
-    <DashboardSection eyebrow="Recent Activity" title="Latest operational movement">
+    <DashboardSection eyebrow="Recent Activity" title="Recent workshop activity">
       <div className="dashboard-activity-list">
         {items.map((item) => (
           <article className="dashboard-activity-item" key={`${item.kind}-${item.id}`}>

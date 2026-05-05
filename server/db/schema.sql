@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS Service (
 CREATE TABLE IF NOT EXISTS Part (
   part_id INTEGER PRIMARY KEY,
   part_description TEXT,
+  brand TEXT,
   supplier_name TEXT,
   supplier_cost REAL,
   retail_price REAL

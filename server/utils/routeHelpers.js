@@ -32,6 +32,22 @@ function getOne(db, sql, params = []) {
   });
 }
 
+async function findBlockingReference(db, id, references) {
+  for (const reference of references) {
+    const row = await getOne(
+      db,
+      `SELECT COUNT(*) AS count FROM ${reference.table} WHERE ${reference.column} = ?`,
+      [id]
+    );
+
+    if (Number(row?.count || 0) > 0) {
+      return reference;
+    }
+  }
+
+  return null;
+}
+
 function run(db, sql, params = []) {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function onRun(err) {
@@ -45,6 +61,24 @@ function run(db, sql, params = []) {
       });
     });
   });
+}
+
+async function withTransaction(db, operation) {
+  await run(db, 'BEGIN TRANSACTION');
+
+  try {
+    const result = await operation();
+    await run(db, 'COMMIT');
+    return result;
+  } catch (error) {
+    try {
+      await run(db, 'ROLLBACK');
+    } catch (rollbackError) {
+      // preserve the original error
+    }
+
+    throw error;
+  }
 }
 
 function hasValue(value) {
@@ -180,6 +214,7 @@ function sendValidationErrors(res, errors) {
 module.exports = {
   all,
   asyncHandler,
+  findBlockingReference,
   getOne,
   normalizeText,
   parseText,
@@ -190,4 +225,5 @@ module.exports = {
   sendValidationErrors,
   validateIdParam,
   validateRequired,
+  withTransaction,
 };

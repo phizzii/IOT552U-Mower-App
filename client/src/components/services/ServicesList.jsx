@@ -1,6 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import ExpandableRecord from '../shared/ExpandableRecord';
 
 function ServicesList({ services, onDelete, onEdit, onView }) {
+  const [openServiceId, setOpenServiceId] = useState(null);
   const filteredServices = useMemo(() => services, [services]);
 
   return (
@@ -23,18 +25,11 @@ function ServicesList({ services, onDelete, onEdit, onView }) {
           </p>
         </div>
       ) : (
-        <div className="services-grid">
+        <div className="record-list">
           {filteredServices.map((service) => (
-            <div className="service-card" key={service.service_id}>
-              <div className="service-row">
-                <div>
-                  <h4 className="service-title">{service.service_description}</h4>
-                  <div className="service-meta">{service.machine_type_name || 'General'}</div>
-                </div>
-                <div className="service-price">£{Number(service.price).toFixed(2)}</div>
-              </div>
-
-              <div className="card-actions service-actions">
+            <ExpandableRecord
+              actions={
+                <>
                 <button
                   aria-label={`View ${service.service_description}`}
                   className="icon-button"
@@ -66,8 +61,30 @@ function ServicesList({ services, onDelete, onEdit, onView }) {
                 >
                   ×
                 </button>
+                </>
+              }
+              isOpen={openServiceId === service.service_id}
+              key={service.service_id}
+              onToggle={() =>
+                setOpenServiceId((current) =>
+                  current === service.service_id ? null : service.service_id
+                )
+              }
+              subtitle={service.machine_type_name || 'General'}
+              summary={`£${Number(service.price).toFixed(2)}`}
+              title={service.service_description}
+            >
+              <div className="record-detail-grid">
+                <div className="record-detail-item">
+                  <span className="record-detail-label">Machine type</span>
+                  <strong>{service.machine_type_name || 'General'}</strong>
+                </div>
+                <div className="record-detail-item">
+                  <span className="record-detail-label">Price</span>
+                  <strong>£{Number(service.price).toFixed(2)}</strong>
+                </div>
               </div>
-            </div>
+            </ExpandableRecord>
           ))}
         </div>
       )}

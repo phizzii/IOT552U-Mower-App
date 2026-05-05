@@ -12,9 +12,6 @@ function NavItem({ item, onClick, revealRef }) {
       <span className="nav-item-copy">
         <span className="nav-item-title">{item.label}</span>
       </span>
-      <span className="nav-item-tag" aria-hidden="true">
-        {item.shortLabel}
-      </span>
     </NavLink>
   );
 }

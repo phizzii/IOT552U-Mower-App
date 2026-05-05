@@ -10,12 +10,14 @@ const {
   run,
   sendValidationErrors,
   validateIdParam,
+  withTransaction,
 } = require('../utils/routeHelpers');
 
 function getPartPayload(body) {
   const errors = [];
 
   return {
+    brand: parseText(body.brand, 'brand', errors),
     errors,
     part_description: parseText(body.part_description, 'part_description', errors, {
       required: true,
@@ -72,15 +74,17 @@ router.post(
     const sql = `
       INSERT INTO Part (
         part_description,
+        brand,
         supplier_name,
         supplier_cost,
         retail_price
       )
-      VALUES (?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?)
     `;
 
     const result = await run(db, sql, [
       payload.part_description,
+      payload.brand,
       payload.supplier_name,
       payload.supplier_cost,
       payload.retail_price,
@@ -108,6 +112,7 @@ router.put(
       UPDATE Part
       SET
         part_description = ?,
+        brand = ?,
         supplier_name = ?,
         supplier_cost = ?,
         retail_price = ?
@@ -116,6 +121,7 @@ router.put(
 
     const result = await run(db, sql, [
       payload.part_description,
+      payload.brand,
       payload.supplier_name,
       payload.supplier_cost,
       payload.retail_price,
@@ -139,8 +145,10 @@ router.delete(
       return;
     }
 
-    const sql = 'DELETE FROM Part WHERE part_id = ?';
-    const result = await run(db, sql, [id]);
+    const result = await withTransaction(db, async () => {
+      await run(db, 'DELETE FROM Job_Part WHERE part_id = ?', [id]);
+      return run(db, 'DELETE FROM Part WHERE part_id = ?', [id]);
+    });
 
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Part not found' });
