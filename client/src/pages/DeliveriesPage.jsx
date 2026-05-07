@@ -24,9 +24,15 @@ function renderAddress(customer) {
 function fallbackLatLng(address) {
   const normalized = String(address || '').trim().toLowerCase();
   const seed = normalized.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  const lat = 51.45 + ((seed * 37) % 80) * 0.003;
-  const lng = -0.12 + ((seed * 53) % 80) * 0.004;
-  return [lat, lng];
+ 
+  // Create deterministic offsets around the workshop in Kent
+  const latOffset = (((seed * 37) % 100) - 50) * 0.0015;
+  const lngOffset = (((seed * 53) % 100) - 50) * 0.0015;
+ 
+  return [
+    WORKSHOP_LATLNG[0] + latOffset,
+    WORKSHOP_LATLNG[1] + lngOffset,
+  ];
 }
 
 function degreesToRadians(degrees) {
@@ -139,6 +145,7 @@ function DeliveriesPage() {
   const geocodeQueueRef = useRef(new Set());
   const [startMode, setStartMode] = useState('workshop');
   const [customStartAddress, setCustomStartAddress] = useState('');
+  const addingTaskRef = useRef(false);
 
   const startAddress = startMode === 'workshop' || !customStartAddress.trim() ? WORKSHOP_ADDRESS : customStartAddress.trim();
 
@@ -264,19 +271,43 @@ function DeliveriesPage() {
   }
 
   function handleDragEnd() {
+    // dragItem is now cleared immediately after drop, so this is a safety net
     setDragItem(null);
   }
 
   function addTaskToRoute(taskId) {
+    // Prevent re-entry from race conditions
+    if (addingTaskRef.current) {
+      return;
+    }
+    
     const task = availableTasks.find((item) => item.taskId === taskId);
-    if (!task || routeTasks.some((item) => item.taskId === taskId)) {
+    if (!task) {
       return;
     }
 
-    setRouteTasks((current) => optimizeRoute([...current, task].map((t) => ({
-      ...t,
-      latlng: geocodeCache[t.address] || fallbackLatLng(t.address),
-    })), startLatLng));
+    // Check if task is already in route
+    if (routeTasks.some((item) => item.taskId === taskId)) {
+      return;
+    }
+
+    addingTaskRef.current = true;
+    
+    setRouteTasks((current) => {
+      // Double-check before adding
+      if (current.some((item) => item.taskId === taskId)) {
+        addingTaskRef.current = false;
+        return current;
+      }
+
+      const newTasks = [...current, task].map((t) => ({
+        ...t,
+        latlng: geocodeCache[t.address] || fallbackLatLng(t.address),
+      }));
+      
+      addingTaskRef.current = false;
+      return newTasks;
+    });
   }
 
   function moveTaskInRoute(taskId, targetTaskId) {
@@ -292,26 +323,32 @@ function DeliveriesPage() {
     setRouteTasks(updated);
   }
 
-  function handleDropOnRoute(taskId) {
-    if (!dragItem) {
-      return;
-    }
-
-    if (dragItem.source === 'available') {
-      addTaskToRoute(dragItem.taskId);
-    } else if (dragItem.source === 'route') {
-      moveTaskInRoute(dragItem.taskId, taskId);
-    }
-  }
-
   function handleDropOnRouteZone(event) {
     event.preventDefault();
     if (!dragItem) {
       return;
     }
 
-    if (dragItem.source === 'available') {
-      addTaskToRoute(dragItem.taskId);
+    const item = dragItem;
+    setDragItem(null); // Clear immediately to prevent double-fires
+    
+    if (item.source === 'available') {
+      addTaskToRoute(item.taskId);
+    }
+  }
+
+  function handleDropOnRoute(taskId) {
+    if (!dragItem) {
+      return;
+    }
+
+    const item = dragItem;
+    setDragItem(null); // Clear immediately to prevent double-fires
+
+    if (item.source === 'available') {
+      addTaskToRoute(item.taskId);
+    } else if (item.source === 'route') {
+      moveTaskInRoute(item.taskId, taskId);
     }
   }
 
