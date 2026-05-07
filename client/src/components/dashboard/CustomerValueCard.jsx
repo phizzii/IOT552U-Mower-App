@@ -1,60 +1,67 @@
 import DashboardSection from './DashboardSection';
 import { formatCurrency } from '../../utils/formatters';
-
+ 
 function CustomerValueCard({ topCustomers }) {
-  const customers = topCustomers.slice(0, 5);
+  const customers = topCustomers || [];
   const maxValue = customers.reduce(
     (highest, customer) => Math.max(highest, Number(customer.lifetimeValue) || 0),
     0
   );
+ 
+  const totalShownValue = customers.reduce(
+    (sum, customer) => sum + Number(customer.lifetimeValue || 0),
+    0
+  );
+ 
   const topCustomerShare =
-    customers.length > 0
-      ? ((Number(customers[0].lifetimeValue || 0) /
-          customers.reduce((sum, customer) => sum + Number(customer.lifetimeValue || 0), 0)) *
-          100 || 0)
+    customers.length > 0 && totalShownValue > 0
+      ? ((Number(customers[0].lifetimeValue || 0) / totalShownValue) * 100)
       : 0;
-
+ 
   return (
-    <DashboardSection eyebrow="Customer Analysis" title="Top Customers by Lifetime Value">
+<DashboardSection eyebrow="Customer Analysis" title="Top Customers by Lifetime Value">
       {customers.length === 0 ? (
-        <div className="report-empty-state">No customer value data available</div>
+<div className="report-empty-state">No customer value data available</div>
       ) : (
-        <>
-          <div className="report-bar-list">
+<>
+<div className="report-bar-list">
             {customers.map((customer) => {
               const value = Number(customer.lifetimeValue) || 0;
-
+ 
               return (
-                <article className="report-bar-row" key={customer.customerId}>
-                  <div className="report-bar-header">
-                    <div className="report-bar-copy">
-                      <strong>{customer.name}</strong>
-                      <span>{customer.jobCount} jobs · {customer.invoiceCount} invoices</span>
-                    </div>
-                    <span className="report-bar-value">{formatCurrency(value)}</span>
-                  </div>
-
+<article className="report-bar-row" key={customer.customerId}>
+<div className="report-bar-header">
+<div className="report-bar-copy">
+<strong>{customer.name}</strong>
+<span>
+                        {customer.jobCount} jobs · {customer.invoiceCount} invoices
+                        {customer.machineCount !== undefined ? ` · ${customer.machineCount} machines` : ''}
+</span>
+</div>
+<span className="report-bar-value">{formatCurrency(value)}</span>
+</div>
+ 
                   <div className="report-bar-track">
-                    <div
+<div
                       className="report-bar-fill is-customer"
                       style={{
                         width: maxValue > 0 ? `${(value / maxValue) * 100}%` : '0%',
                       }}
                     />
-                  </div>
-                </article>
+</div>
+</article>
               );
             })}
-          </div>
-
+</div>
+ 
           <div className="dashboard-inline-note">
-            <span className="dashboard-inline-label">Top customer share</span>
-            <strong>{topCustomerShare.toFixed(1)}% of shown customer value</strong>
-          </div>
-        </>
+<span className="dashboard-inline-label">Top customer share</span>
+<strong>{topCustomerShare.toFixed(1)}% of shown customer value</strong>
+</div>
+</>
       )}
-    </DashboardSection>
+</DashboardSection>
   );
 }
-
+ 
 export default CustomerValueCard;

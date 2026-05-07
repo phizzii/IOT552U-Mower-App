@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import DashboardSection from './DashboardSection';
 import { formatCurrency, formatShortDate } from '../../utils/formatters';
 
@@ -12,7 +13,10 @@ function buildLinePoints(points, width, height, paddingX, paddingY) {
 
   return points.map((point, index) => {
     const revenue = Number(point.revenue) || 0;
-    const x = points.length === 1 ? width / 2 : paddingX + (usableWidth * index) / (points.length - 1);
+    const x =
+      points.length === 1
+        ? width / 2
+        : paddingX + (usableWidth * index) / (points.length - 1);
     const y = height - paddingY - (revenue / maxRevenue) * usableHeight;
 
     return {
@@ -25,18 +29,38 @@ function buildLinePoints(points, width, height, paddingX, paddingY) {
 }
 
 function RevenueAnalysisCard({ revenueOverTime, serviceBreakdown, totalRevenue }) {
+  const [selectedServiceKey, setSelectedServiceKey] = useState(null);
+
   const chartWidth = 560;
   const chartHeight = 220;
   const linePoints = buildLinePoints(revenueOverTime, chartWidth, chartHeight, 24, 20);
   const polylinePoints = linePoints.map((point) => `${point.x},${point.y}`).join(' ');
+
   const maxServiceRevenue = serviceBreakdown.reduce(
     (highest, item) => Math.max(highest, Number(item.revenue) || 0),
     0
   );
+
   const averageRevenue =
-    revenueOverTime.length > 0
-      ? totalRevenue / revenueOverTime.length
-      : 0;
+    revenueOverTime.length > 0 ? totalRevenue / revenueOverTime.length : 0;
+
+  const selectedService = useMemo(() => {
+    if (!selectedServiceKey) {
+      return null;
+    }
+
+    return (
+      serviceBreakdown.find(
+        (service) =>
+          `${service.service}-${service.machineType || 'all'}` === selectedServiceKey
+      ) || null
+    );
+  }, [selectedServiceKey, serviceBreakdown]);
+
+  function handleServiceClick(service) {
+    const key = `${service.service}-${service.machineType || 'all'}`;
+    setSelectedServiceKey((current) => (current === key ? null : key));
+  }
 
   return (
     <DashboardSection eyebrow="Financial Trends" title="Revenue Over Time">
@@ -84,13 +108,14 @@ function RevenueAnalysisCard({ revenueOverTime, serviceBreakdown, totalRevenue }
               />
 
               {linePoints.map((point) => (
-                <circle
-                  className="report-line-point"
-                  cx={point.x}
-                  cy={point.y}
-                  key={point.date}
-                  r="5"
-                />
+                <g key={point.date}>
+                  <circle
+                    className="report-line-point"
+                    cx={point.x}
+                    cy={point.y}
+                    r="5"
+                  />
+                </g>
               ))}
             </svg>
 
@@ -99,6 +124,9 @@ function RevenueAnalysisCard({ revenueOverTime, serviceBreakdown, totalRevenue }
                 <div className="report-line-axis-item" key={point.date}>
                   <span>{formatShortDate(point.date)}</span>
                   <strong>{formatCurrency(point.revenue)}</strong>
+                  <small className="report-line-axis-meta">
+                    {point.invoiceCount} invoice{point.invoiceCount === 1 ? '' : 's'}
+                  </small>
                 </div>
               ))}
             </div>
@@ -109,38 +137,104 @@ function RevenueAnalysisCard({ revenueOverTime, serviceBreakdown, totalRevenue }
       <div className="report-chart-block">
         <div className="report-chart-heading">
           <strong>Top services by revenue</strong>
-          <span>Highest-earning service lines</span>
+          <span>Click a service to inspect its contribution and highlight the matching table row</span>
         </div>
 
         {serviceBreakdown.length === 0 ? (
           <div className="report-empty-state">No service revenue data available</div>
         ) : (
-          <div className="report-bar-list">
-            {serviceBreakdown.slice(0, 5).map((service) => {
-              const revenue = Number(service.revenue) || 0;
+          <>
+            <div className="report-bar-list">
+              {serviceBreakdown.map((service) => {
+                const revenue = Number(service.revenue) || 0;
+                const serviceKey = `${service.service}-${service.machineType || 'all'}`;
+                const isSelected = selectedServiceKey === serviceKey;
 
-              return (
-                <article className="report-bar-row" key={service.service}>
-                  <div className="report-bar-header">
-                    <div className="report-bar-copy">
-                      <strong>{service.service}</strong>
-                      <span>{service.jobCount} jobs</span>
-                    </div>
-                    <span className="report-bar-value">{formatCurrency(revenue)}</span>
-                  </div>
+                return (
+                  <article
+                    className={`report-bar-row report-bar-row--interactive ${isSelected ? 'is-selected' : ''}`}
+                    key={serviceKey}
+                  >
+                    <button
+                      className="report-bar-button"
+                      onClick={() => handleServiceClick(service)}
+                      type="button"
+                    >
+                      <div className="report-bar-header">
+                        <div className="report-bar-copy">
+                          <strong>{service.service}</strong>
+                          <span>
+                            {service.jobCount} jobs
+                            {service.machineType ? ` · ${service.machineType}` : ''}
+                          </span>
+                        </div>
+                        <span className="report-bar-value">{formatCurrency(revenue)}</span>
+                      </div>
 
-                  <div className="report-bar-track">
-                    <div
-                      className="report-bar-fill is-revenue"
-                      style={{
-                        width: maxServiceRevenue > 0 ? `${(revenue / maxServiceRevenue) * 100}%` : '0%',
-                      }}
-                    />
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+                      <div className="report-bar-track">
+                        <div
+                          className={`report-bar-fill is-revenue ${isSelected ? 'is-selected' : ''}`}
+                          style={{
+                            width:
+                              maxServiceRevenue > 0
+                                ? `${(revenue / maxServiceRevenue) * 100}%`
+                                : '0%',
+                          }}
+                        />
+                      </div>
+                    </button>
+                  </article>
+                );
+              })}
+            </div>
+
+            {selectedService ? (
+              <div className="dashboard-inline-note">
+                <span className="dashboard-inline-label">Selected service</span>
+                <strong>
+                  {selectedService.service} · {formatCurrency(selectedService.revenue || 0)} ·{' '}
+                  {selectedService.jobCount} jobs
+                  {selectedService.machineType ? ` · ${selectedService.machineType}` : ''}
+                </strong>
+              </div>
+            ) : (
+              <div className="dashboard-inline-note">
+                <span className="dashboard-inline-label">Selection</span>
+                <strong>Click a service bar to inspect and highlight it</strong>
+              </div>
+            )}
+
+            <div className="report-table-wrap">
+              <table className="report-table">
+                <thead>
+                  <tr>
+                    <th>Service</th>
+                    <th>Machine Type</th>
+                    <th>Jobs</th>
+                    <th>Revenue</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {serviceBreakdown.map((service) => {
+                    const serviceKey = `${service.service}-${service.machineType || 'all'}`;
+                    const isSelected = selectedServiceKey === serviceKey;
+
+                    return (
+                      <tr
+                        className={isSelected ? 'report-table-row-selected' : ''}
+                        key={`table-${serviceKey}`}
+                      >
+                        <td>{service.service}</td>
+                        <td>{service.machineType || '—'}</td>
+                        <td>{service.jobCount}</td>
+                        <td>{formatCurrency(service.revenue || 0)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </DashboardSection>
