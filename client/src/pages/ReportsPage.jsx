@@ -110,7 +110,6 @@ function ReportsPage() {
           {efficiency && (
             <OperationalEfficiencyCard
               repairTime={efficiency.repairTime}
-              mechanicsPerformance={efficiency.mechanicsPerformance}
               labourMetrics={efficiency.labourMetrics}
             />
           )}

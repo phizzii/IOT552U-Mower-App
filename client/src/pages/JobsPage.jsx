@@ -84,7 +84,6 @@ function calculateTotals(jobLineItems, jobParts) {
 
 function buildRepairJobPayload(job) {
   return {
-    assigned_mechanic: job.assigned_mechanic || '',
     contact_method: job.contact_method || '',
     customer_id: job.customer_id,
     date_collected: job.date_collected || '',
@@ -327,7 +326,6 @@ function JobsPage() {
       }
 
       const repairJobPayload = {
-        assigned_mechanic: formState.assigned_mechanic,
         contact_method: formState.contact_method,
         customer_id: Number(formState.customer_id),
         date_collected: formState.date_collected,

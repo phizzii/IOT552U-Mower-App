@@ -33,7 +33,6 @@ function JobsTable({ jobs, onSelect, selectedJobId }) {
                 <th>Machine</th>
                 <th>Status</th>
                 <th>Date Logged</th>
-                <th>Assigned Mechanic</th>
               </tr>
             </thead>
             <tbody>
@@ -61,7 +60,6 @@ function JobsTable({ jobs, onSelect, selectedJobId }) {
                       <span className="status-chip">{job.status || 'Unspecified'}</span>
                     </td>
                     <td>{formatDate(job.date_logged)}</td>
-                    <td>{job.assigned_mechanic || 'Unassigned'}</td>
                   </tr>
                 );
               })}

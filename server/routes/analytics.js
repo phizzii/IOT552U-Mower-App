@@ -111,7 +111,7 @@ router.get(
 
 /**
  * GET /api/analytics/operational-efficiency
- * Returns average repair time and jobs per mechanic
+ * Returns average repair time and labour metrics
  */
 router.get(
   '/operational-efficiency',
@@ -128,18 +128,6 @@ router.get(
       WHERE date_finished IS NOT NULL AND date_logged IS NOT NULL
     `;
 
-    // Jobs per mechanic
-    const mechanicSql = `
-      SELECT
-        assigned_mechanic,
-        COUNT(*) as job_count,
-        COUNT(CASE WHEN status = 'Completed' OR status = 'Collected' THEN 1 END) as completed_count
-      FROM Repair_Job
-      WHERE assigned_mechanic IS NOT NULL AND TRIM(assigned_mechanic) != ''
-      GROUP BY assigned_mechanic
-      ORDER BY job_count DESC
-    `;
-
     // Average labour hours per job
     const labourSql = `
       SELECT
@@ -150,7 +138,6 @@ router.get(
     `;
 
     const repairTimeRow = await getOne(db, repairTimeSql);
-    const mechanicRows = await all(db, mechanicSql);
     const labourRow = await getOne(db, labourSql);
 
     res.json({
@@ -159,12 +146,6 @@ router.get(
         completedJobs: repairTimeRow?.completed_jobs || 0,
         totalJobs: repairTimeRow?.total_jobs || 0,
       },
-      mechanicsPerformance: mechanicRows.map((row) => ({
-        mechanic: row.assigned_mechanic,
-        totalJobs: row.job_count,
-        completedJobs: row.completed_count,
-        completionRate: row.job_count > 0 ? ((row.completed_count / row.job_count) * 100).toFixed(1) : 0,
-      })),
       labourMetrics: {
         avgHours: labourRow?.avg_labour_hours || 0,
         avgCost: labourRow?.avg_labour_cost || 0,

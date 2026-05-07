@@ -9,7 +9,6 @@ const steps = [
 
 function createInitialState(initialJob) {
   return {
-    assigned_mechanic: initialJob?.assigned_mechanic || '',
     contact_method: initialJob?.contact_method || 'Phone',
     customer_id: initialJob?.customer_id ? String(initialJob.customer_id) : '',
     date_collected: initialJob?.date_collected || '',
@@ -104,10 +103,6 @@ function JobWizard({
 
     if (step === 3 && (!formState.date_logged || !formState.instruction)) {
       return 'Add the logged date and the initial issue description before moving on.';
-    }
-
-    if (step === 4 && !formState.assigned_mechanic) {
-      return 'Assign the job to a mechanic so it appears clearly in the workshop queue.';
     }
 
     return '';
@@ -339,14 +334,6 @@ function JobWizard({
 
           {currentStep === 4 ? (
             <div className="wizard-step-body wizard-field-grid">
-              <label className="field-group">
-                <span className="field-label">Assigned mechanic</span>
-                <input
-                  className="field-control"
-                  onChange={(event) => updateField('assigned_mechanic', event.target.value)}
-                  value={formState.assigned_mechanic}
-                />
-              </label>
               <label className="field-group">
                 <span className="field-label">Status</span>
                 <select

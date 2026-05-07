@@ -2439,6 +2439,30 @@ textarea {
   gap: 14px;
 }
 
+.delivery-list {
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.delivery-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.delivery-list::-webkit-scrollbar-track {
+  background: rgba(48, 92, 71, 0.06);
+  border-radius: 4px;
+}
+
+.delivery-list::-webkit-scrollbar-thumb {
+  background: rgba(48, 92, 71, 0.2);
+  border-radius: 4px;
+}
+
+.delivery-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(48, 92, 71, 0.35);
+}
+
 .delivery-task-card,
 .route-task-card,
 .delivery-summary-card {
@@ -2579,24 +2603,26 @@ textarea {
   padding: 20px;
   min-height: 520px;
 }
-
+ 
 .map-panel-header {
   display: grid;
   gap: 8px;
 }
-
+ 
 .map-canvas {
   position: relative;
+  height: 540px;
   min-height: 540px;
   width: 100%;
   border-radius: 22px;
   overflow: hidden;
 }
-
+ 
 .map-canvas--leaflet {
+  height: 540px;
   min-height: 540px;
 }
-
+ 
 .map-panel-fullscreen {
   position: fixed;
   inset: 0;
@@ -2611,21 +2637,28 @@ textarea {
   padding: 24px;
   overflow: hidden;
 }
-
-.map-panel-fullscreen .map-canvas {
+ 
+.map-panel-fullscreen .map-canvas,
+.map-panel-fullscreen .map-canvas--leaflet {
+  height: calc(100vh - 140px);
   min-height: calc(100vh - 140px);
+  border-radius: 16px;
 }
-
-.map-fullscreen-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 18, 0.32);
-  z-index: 1200;
-}
-
+ 
 @media (max-width: 1080px) {
-  .map-panel,
-  .map-canvas--leaflet {
+  .map-panel {
     min-height: 420px;
+  }
+ 
+  .map-canvas,
+  .map-canvas--leaflet {
+    height: 420px;
+    min-height: 420px;
+  }
+ 
+  .map-panel-fullscreen .map-canvas,
+  .map-panel-fullscreen .map-canvas--leaflet {
+    height: calc(100vh - 140px);
+    min-height: calc(100vh - 140px);
   }
 }
