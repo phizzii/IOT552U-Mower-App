@@ -1,9 +1,19 @@
 import { useMemo, useState } from 'react';
+import usePagination from '../../hooks/usePagination';
 import ExpandableRecord from '../shared/ExpandableRecord';
+import PaginationControls from '../shared/PaginationControls';
 
 function ServicesList({ services, onDelete, onEdit, onView }) {
   const [openServiceId, setOpenServiceId] = useState(null);
   const filteredServices = useMemo(() => services, [services]);
+  const {
+    currentPage,
+    paginatedItems,
+    range,
+    setCurrentPage,
+    totalItems,
+    totalPages,
+  } = usePagination(filteredServices);
 
   return (
     <div className="services-list-card surface-card">
@@ -25,8 +35,9 @@ function ServicesList({ services, onDelete, onEdit, onView }) {
           </p>
         </div>
       ) : (
+        <>
         <div className="record-list">
-          {filteredServices.map((service) => (
+          {paginatedItems.map((service) => (
             <ExpandableRecord
               actions={
                 <>
@@ -87,6 +98,14 @@ function ServicesList({ services, onDelete, onEdit, onView }) {
             </ExpandableRecord>
           ))}
         </div>
+        <PaginationControls
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          range={range}
+          totalItems={totalItems}
+          totalPages={totalPages}
+        />
+        </>
       )}
     </div>
   );

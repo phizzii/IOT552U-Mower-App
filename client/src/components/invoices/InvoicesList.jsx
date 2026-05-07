@@ -1,9 +1,19 @@
 import { useMemo, useState } from 'react';
+import usePagination from '../../hooks/usePagination';
 import ExpandableRecord from '../shared/ExpandableRecord';
+import PaginationControls from '../shared/PaginationControls';
 
 function InvoicesList({ invoices, onDelete, onEdit, onView }) {
   const [openInvoiceId, setOpenInvoiceId] = useState(null);
   const filteredInvoices = useMemo(() => invoices, [invoices]);
+  const {
+    currentPage,
+    paginatedItems,
+    range,
+    setCurrentPage,
+    totalItems,
+    totalPages,
+  } = usePagination(filteredInvoices);
 
   return (
     <div className="invoices-list-card surface-card">
@@ -25,13 +35,16 @@ function InvoicesList({ invoices, onDelete, onEdit, onView }) {
           </p>
         </div>
       ) : (
+        <>
         <div className="record-list">
-          {filteredInvoices.map((invoice) => {
+          {paginatedItems.map((invoice) => {
             const customerName = invoice.customer_first_name
               ? `${invoice.customer_first_name} ${invoice.customer_last_name}`
               : 'Unknown customer';
             const reference = invoice.job_no
-              ? `Job #${invoice.job_no}`
+              ? `Job #${invoice.job_no}${invoice.sale_item_summary ? ` + ${invoice.sale_item_summary}` : ''}`
+              : invoice.sale_item_summary
+              ? invoice.sale_item_summary
               : invoice.sale_item_no
               ? `Sale item #${invoice.sale_item_no}`
               : 'No reference';
@@ -104,6 +117,14 @@ function InvoicesList({ invoices, onDelete, onEdit, onView }) {
             );
           })}
         </div>
+        <PaginationControls
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          range={range}
+          totalItems={totalItems}
+          totalPages={totalPages}
+        />
+        </>
       )}
     </div>
   );

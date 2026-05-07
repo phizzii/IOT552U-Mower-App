@@ -145,6 +145,8 @@ function DeliveriesPage() {
   const geocodeQueueRef = useRef(new Set());
   const [startMode, setStartMode] = useState('workshop');
   const [customStartAddress, setCustomStartAddress] = useState('');
+  const [taskSearch, setTaskSearch] = useState('');
+  const [taskStatusFilter, setTaskStatusFilter] = useState('');
   const addingTaskRef = useRef(false);
 
   const startAddress = startMode === 'workshop' || !customStartAddress.trim() ? WORKSHOP_ADDRESS : customStartAddress.trim();
@@ -193,7 +195,7 @@ function DeliveriesPage() {
     const taskMap = routeTasks.reduce((map, item) => map.set(item.taskId, true), new Map());
 
     return jobs
-      .filter((job) => ['Collected', 'Completed'].includes(job.status))
+      .filter((job) => !['In Progress', 'Awaiting Parts'].includes(job.status))
       .map((job) => {
         const customer = customersById[job.customer_id];
         const address = renderAddress(customer);
@@ -214,6 +216,37 @@ function DeliveriesPage() {
       })
       .filter((task) => !taskMap.has(task.taskId));
   }, [jobs, customersById, routeTasks]);
+  const availableStatusOptions = useMemo(
+    () => [...new Set(availableTasks.map((task) => task.status).filter(Boolean))].sort((a, b) => a.localeCompare(b)),
+    [availableTasks]
+  );
+  const filteredAvailableTasks = useMemo(() => {
+    const normalizedSearch = taskSearch.trim().toLowerCase();
+
+    return availableTasks.filter((task) => {
+      const matchesStatus = !taskStatusFilter || task.status === taskStatusFilter;
+
+      if (!matchesStatus) {
+        return false;
+      }
+
+      if (!normalizedSearch) {
+        return true;
+      }
+
+      return [
+        task.reference,
+        task.machine_label,
+        task.customer_name,
+        task.address,
+        task.status,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+        .includes(normalizedSearch);
+    });
+  }, [availableTasks, taskSearch, taskStatusFilter]);
 
   const cachedAddresses = useMemo(
     () => new Set([
@@ -370,7 +403,7 @@ function DeliveriesPage() {
     <div className="page-wrapper deliveries-page">
       <PageHeader
         eyebrow="Logistics"
-        title="Deliveries & Route Planning"
+        title="Deliveries & Collections"
       />
 
       {error ? <div className="feedback-banner error">{error}</div> : null}
@@ -429,24 +462,52 @@ function DeliveriesPage() {
           <section className="surface-card delivery-panel">
             <div className="delivery-panel-header">
               <div>
-                <h4 className="section-title">Available deliveries</h4>
+                <h4 className="section-title">Available Jobs</h4>
               </div>
-              <span className="badge">{availableTasks.length} ready</span>
+              <span className="badge">{filteredAvailableTasks.length} shown</span>
+            </div>
+
+            <div className="filters-row">
+              <div className="search-field-group">
+                <input
+                  className="field-control"
+                  onChange={(event) => setTaskSearch(event.target.value)}
+                  placeholder="Search by job, customer, machine, or address..."
+                  type="text"
+                  value={taskSearch}
+                />
+              </div>
+
+              <label className="field-group narrow">
+                <span className="field-label">Status</span>
+                <select
+                  className="field-control"
+                  onChange={(event) => setTaskStatusFilter(event.target.value)}
+                  value={taskStatusFilter}
+                >
+                  <option value="">All eligible</option>
+                  {availableStatusOptions.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
 
             <div className="delivery-list">
               {isLoading ? (
                 <div className="loading-state">Loading tasks…</div>
-              ) : availableTasks.length === 0 ? (
+              ) : filteredAvailableTasks.length === 0 ? (
                 <div className="empty-state">
                   <div className="empty-state-icon">📦</div>
-                  <h4 className="empty-state-title">No ready deliveries</h4>
+                  <h4 className="empty-state-title">No matching jobs</h4>
                   <p className="empty-state-copy">
-                    All collected jobs are already in the route or there are no ready tasks.
+                    Every eligible job is already on the route, or your current filters are hiding them.
                   </p>
                 </div>
               ) : (
-                availableTasks.map((task) => (
+                filteredAvailableTasks.map((task) => (
                   <article
                     key={task.taskId}
                     className="delivery-task-card"

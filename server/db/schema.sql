@@ -120,3 +120,12 @@ CREATE TABLE IF NOT EXISTS Invoice (
   FOREIGN KEY (job_no) REFERENCES Repair_Job(job_no),
   FOREIGN KEY (sale_item_no) REFERENCES Sale_Item(sale_item_no)
 );
+
+CREATE TABLE IF NOT EXISTS Invoice_Sale_Item (
+  invoice_sale_item_id INTEGER PRIMARY KEY,
+  invoice_no INTEGER NOT NULL,
+  sale_item_no INTEGER NOT NULL,
+  quantity INTEGER NOT NULL DEFAULT 1,
+  FOREIGN KEY (invoice_no) REFERENCES Invoice(invoice_no),
+  FOREIGN KEY (sale_item_no) REFERENCES Sale_Item(sale_item_no)
+);

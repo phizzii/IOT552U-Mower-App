@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
+import usePagination from '../../hooks/usePagination';
 import ExpandableRecord from '../shared/ExpandableRecord';
+import PaginationControls from '../shared/PaginationControls';
 
 function MachinesList({
   machineTypes,
@@ -38,6 +40,16 @@ function MachinesList({
 
     return filtered;
   }, [machines, searchTerm, machineTypeFilter]);
+  const {
+    currentPage,
+    paginatedItems,
+    range,
+    setCurrentPage,
+    totalItems,
+    totalPages,
+  } = usePagination(filteredMachines, {
+    resetKeys: [searchTerm, machineTypeFilter],
+  });
 
   return (
     <section className="surface-card machines-list-card" data-reveal="machines-list">
@@ -89,8 +101,9 @@ function MachinesList({
           </span>
         </div>
       ) : (
+        <>
         <div className="record-list">
-          {filteredMachines.map((machine) => (
+          {paginatedItems.map((machine) => (
             <ExpandableRecord
               actions={
                 <>
@@ -157,6 +170,14 @@ function MachinesList({
             </ExpandableRecord>
           ))}
         </div>
+        <PaginationControls
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          range={range}
+          totalItems={totalItems}
+          totalPages={totalPages}
+        />
+        </>
       )}
     </section>
   );

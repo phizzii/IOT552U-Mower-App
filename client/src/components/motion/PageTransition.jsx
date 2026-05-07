@@ -20,7 +20,6 @@ function PageTransition({ children, pathname }) {
     timeline
       .add(containerRef.current, {
         opacity: [0, 1],
-        translateY: ['16px', '0px'],
       });
 
     if (revealNodes.length > 0) {
