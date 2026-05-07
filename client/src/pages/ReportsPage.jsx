@@ -5,6 +5,7 @@ import OperationalEfficiencyCard from '../components/dashboard/OperationalEffici
 import LogisticsAnalysisCard from '../components/dashboard/LogisticsAnalysisCard';
 import CustomerValueCard from '../components/dashboard/CustomerValueCard';
 import ReportFilterBar from '../components/dashboard/ReportFilterBar';
+import ActiveFiltersSummary from '../components/dashboard/ActiveFiltersSummary';
 import PageHeader from '../components/navigation/PageHeader';
 import { fetchJson } from '../utils/api';
  
@@ -123,6 +124,8 @@ function ReportsPage() {
         onChange={handleFilterChange}
         onReset={handleResetFilters}
       />
+      
+      <ActiveFiltersSummary filters={filters} machineTypes={machineTypes} />
  
       <div className="reports-layout">
 <div className="reports-row reports-row--balanced">

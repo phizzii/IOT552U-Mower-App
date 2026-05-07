@@ -195,6 +195,13 @@ function RevenueAnalysisCard({ revenueOverTime, serviceBreakdown, totalRevenue }
                   {selectedService.service} · {formatCurrency(selectedService.revenue || 0)} ·{' '}
                   {selectedService.jobCount} jobs
                   {selectedService.machineType ? ` · ${selectedService.machineType}` : ''}
+                  {' · '}
+                  {(
+                    ((Number(selectedService.revenue || 0) /
+                      serviceBreakdown.reduce((sum, service) => sum + Number(service.revenue || 0), 0)) *
+                      100) || 0
+                  ).toFixed(1)}
+                  % of shown service revenue
                 </strong>
               </div>
             ) : (

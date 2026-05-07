@@ -958,6 +958,11 @@ textarea {
   background: rgba(48, 92, 71, 0.08);
 }
 
+.report-active-filters {
+  display: grid;
+  gap: 12px;
+}
+
 .report-simple-list {
   display: grid;
   gap: 12px;
