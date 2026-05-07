@@ -1,52 +1,45 @@
 import DashboardSection from './DashboardSection';
 import { formatCurrency } from '../../utils/formatters';
 
-function OperationalEfficiencyCard({ repairTime, mechanicsPerformance, labourMetrics }) {
+function OperationalEfficiencyCard({ labourMetrics, mechanicsPerformance, repairTime }) {
   return (
-    <DashboardSection eyebrow="Productivity" title="Operational efficiency">
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-        <div className="dashboard-kpi-card tone-forest">
-          <span className="dashboard-kpi-label">Avg repair time</span>
-          <strong className="dashboard-kpi-value">
+    <DashboardSection eyebrow="Productivity" title="Operational Efficiency">
+      <div className="report-kpi-strip report-kpi-strip--two-up">
+        <div className="report-kpi-tile">
+          <span className="report-kpi-label">Average Repair Time</span>
+          <strong className="report-kpi-value">
             {repairTime.avgDays ? `${repairTime.avgDays} days` : '—'}
           </strong>
-          <p className="dashboard-kpi-detail">
+          <span className="report-kpi-meta">
             {repairTime.completedJobs} of {repairTime.totalJobs} completed
-          </p>
+          </span>
         </div>
 
-        <div className="dashboard-kpi-card tone-forest">
-          <span className="dashboard-kpi-label">Avg labour cost</span>
-          <strong className="dashboard-kpi-value">
+        <div className="report-kpi-tile">
+          <span className="report-kpi-label">Average Labour Cost</span>
+          <strong className="report-kpi-value">
             {labourMetrics.avgCost ? formatCurrency(labourMetrics.avgCost) : '—'}
           </strong>
-          <p className="dashboard-kpi-detail">{labourMetrics.avgHours} hours per job</p>
+          <span className="report-kpi-meta">
+            {labourMetrics.avgHours || 0} hours per job
+          </span>
         </div>
       </div>
 
-      <div>
-        <h4 style={{ fontSize: '0.95rem', marginBottom: '12px', color: 'var(--ink-soft)' }}>
-          Mechanic performance
-        </h4>
-        <div className="dashboard-status-list">
+      {mechanicsPerformance.length > 0 ? (
+        <div className="report-simple-list">
           {mechanicsPerformance.map((mechanic) => (
-            <div className="dashboard-status-row" key={mechanic.mechanic}>
-              <div className="dashboard-status-copy">
+            <div className="report-simple-row" key={mechanic.mechanic}>
+              <div className="report-simple-copy">
                 <strong>{mechanic.mechanic}</strong>
-                <span>{mechanic.totalJobs} total • {mechanic.completedJobs} completed</span>
+                <span>{mechanic.totalJobs} total · {mechanic.completedJobs} completed</span>
               </div>
-              <div>
-                <span style={{ color: 'var(--accent)', fontWeight: '600' }}>
-                  {mechanic.completionRate}%
-                </span>
-              </div>
+              <strong className="report-simple-value">{mechanic.completionRate}%</strong>
             </div>
           ))}
         </div>
-      </div>
-
-      {mechanicsPerformance.length === 0 && (
-        <p style={{ color: 'var(--ink-soft)', fontSize: '0.9rem' }}>No mechanic data available</p>
+      ) : (
+        <div className="report-empty-state">No mechanic data available</div>
       )}
     </DashboardSection>
   );

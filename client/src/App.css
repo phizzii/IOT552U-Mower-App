@@ -641,8 +641,315 @@ textarea {
   grid-template-columns: 1.2fr 1fr;
 }
 
+.reports-layout {
+  display: grid;
+  gap: 18px;
+}
+
+.reports-row {
+  display: grid;
+  gap: 18px;
+}
+
+.reports-row--balanced {
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+}
+
+.reports-row--full {
+  grid-template-columns: 1fr;
+}
+
 .dashboard-section .section-title {
   margin-bottom: 12px;
+}
+
+.report-kpi-strip {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  margin-bottom: 18px;
+}
+
+.report-kpi-strip--two-up {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.report-kpi-tile {
+  background: rgba(48, 92, 71, 0.05);
+  border: 1px solid rgba(48, 92, 71, 0.1);
+  border-radius: 18px;
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+}
+
+.report-kpi-label,
+.report-kpi-meta {
+  color: var(--ink-faint);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.report-kpi-value {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2vw, 2rem);
+  line-height: 1;
+}
+
+.report-chart-block {
+  display: grid;
+  gap: 14px;
+}
+
+.report-chart-heading {
+  display: grid;
+  gap: 4px;
+}
+
+.report-chart-heading strong {
+  font-size: 0.98rem;
+}
+
+.report-chart-heading span {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.report-empty-state {
+  align-items: center;
+  background: rgba(48, 92, 71, 0.05);
+  border: 1px dashed rgba(48, 92, 71, 0.18);
+  border-radius: 18px;
+  color: var(--ink-soft);
+  display: grid;
+  min-height: 140px;
+  padding: 18px;
+  place-items: center;
+  text-align: center;
+}
+
+.report-bar-list {
+  display: grid;
+  gap: 14px;
+}
+
+.report-bar-row {
+  display: grid;
+  gap: 10px;
+}
+
+.report-bar-header {
+  align-items: end;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.report-bar-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.report-bar-copy strong {
+  font-size: 0.96rem;
+}
+
+.report-bar-copy span {
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.report-bar-value {
+  color: var(--accent-strong);
+  font-size: 0.92rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.report-bar-track {
+  background: rgba(48, 92, 71, 0.08);
+  border-radius: 999px;
+  height: 14px;
+  overflow: hidden;
+}
+
+.report-bar-fill {
+  background: linear-gradient(90deg, var(--highlight), var(--accent));
+  border-radius: inherit;
+  height: 100%;
+  min-width: 8px;
+}
+
+.report-bar-fill.is-active {
+  background: linear-gradient(90deg, #a88345, #d4a34f);
+}
+
+.report-bar-fill.is-complete,
+.report-bar-fill.is-customer {
+  background: linear-gradient(90deg, var(--highlight), var(--accent));
+}
+
+.report-bar-fill.is-revenue {
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+}
+
+.report-line-chart-card {
+  display: grid;
+  gap: 14px;
+}
+
+.report-line-chart {
+  background: linear-gradient(180deg, rgba(48, 92, 71, 0.04), rgba(48, 92, 71, 0.08));
+  border: 1px solid rgba(48, 92, 71, 0.08);
+  border-radius: 22px;
+  display: block;
+  height: auto;
+  padding: 8px;
+  width: 100%;
+}
+
+.report-line-grid {
+  stroke: rgba(48, 92, 71, 0.12);
+  stroke-width: 1;
+}
+
+.report-line-path {
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+}
+
+.report-line-point {
+  fill: var(--highlight);
+  stroke: #f7f2e9;
+  stroke-width: 3;
+}
+
+.report-line-axis {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+}
+
+.report-line-axis-item {
+  display: grid;
+  gap: 4px;
+  text-align: center;
+}
+
+.report-line-axis-item span {
+  color: var(--ink-faint);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.report-line-axis-item strong {
+  font-size: 0.88rem;
+}
+
+.report-group-chart {
+  align-items: end;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.report-group-column {
+  background: rgba(48, 92, 71, 0.04);
+  border: 1px solid rgba(48, 92, 71, 0.08);
+  border-radius: 20px;
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.report-group-bars {
+  align-items: end;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-height: 180px;
+}
+
+.report-group-bar-wrap {
+  align-items: end;
+  background: rgba(48, 92, 71, 0.08);
+  border-radius: 16px;
+  display: flex;
+  min-height: 180px;
+  padding: 10px;
+}
+
+.report-group-bar {
+  align-self: end;
+  border-radius: 14px 14px 10px 10px;
+  min-height: 12px;
+  width: 100%;
+}
+
+.report-group-bar.is-charge {
+  background: linear-gradient(180deg, var(--accent), var(--accent-strong));
+}
+
+.report-group-bar.is-mile {
+  background: linear-gradient(180deg, #a7c497, var(--highlight));
+}
+
+.report-group-label {
+  color: var(--ink-faint);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.report-group-meta {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  text-align: center;
+}
+
+.report-group-meta span {
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.report-simple-list {
+  display: grid;
+  gap: 12px;
+}
+
+.report-simple-row {
+  align-items: center;
+  background: rgba(48, 92, 71, 0.04);
+  border: 1px solid rgba(48, 92, 71, 0.08);
+  border-radius: 18px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 14px 16px;
+}
+
+.report-simple-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.report-simple-copy span {
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}
+
+.report-simple-value {
+  color: var(--accent-strong);
 }
 
 .dashboard-status-list {
@@ -1952,7 +2259,8 @@ textarea {
   .settings-metrics,
   .settings-workspace,
   .jobs-workspace,
-  .job-detail-grid {
+  .job-detail-grid,
+  .reports-row--balanced {
     grid-template-columns: 1fr;
   }
 
@@ -1983,6 +2291,12 @@ textarea {
 
   .dashboard-kpi-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .report-group-chart,
+  .report-line-axis,
+  .report-kpi-strip {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   }
 }
 
@@ -2052,6 +2366,11 @@ textarea {
   .record-card-summary {
     justify-self: start;
     text-align: left;
+  }
+
+  .report-bar-header,
+  .report-simple-row {
+    grid-template-columns: 1fr;
   }
 
   .record-detail-item--wide {

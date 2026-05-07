@@ -77,12 +77,11 @@ function ReportsPage() {
   const totalJobs = jobStatus?.byStatus?.reduce((sum, item) => sum + item.count, 0) || 0;
 
   return (
-    <div className="placeholder-page">
+    <div className="placeholder-page reports-page">
       <PageHeader eyebrow="Insights" title="Reports & Visualisations" />
 
-      <div className="dashboard-grid">
-        <div className="page-stack">
-          {/* Job Status Analysis */}
+      <div className="reports-layout">
+        <div className="reports-row reports-row--balanced">
           {jobStatus && (
             <JobStatusAnalysisCard
               byStatus={jobStatus.byStatus}
@@ -91,7 +90,23 @@ function ReportsPage() {
             />
           )}
 
-          {/* Operational Efficiency */}
+          {revenue && (
+            <RevenueAnalysisCard
+              revenueOverTime={revenue.revenueOverTime}
+              serviceBreakdown={revenue.serviceBreakdown}
+              totalRevenue={revenue.totalRevenue}
+            />
+          )}
+        </div>
+
+        <div className="reports-row reports-row--balanced">
+          {logistics && (
+            <LogisticsAnalysisCard
+              summary={logistics.summary}
+              costDistanceAnalysis={logistics.costDistanceAnalysis}
+            />
+          )}
+
           {efficiency && (
             <OperationalEfficiencyCard
               repairTime={efficiency.repairTime}
@@ -101,28 +116,12 @@ function ReportsPage() {
           )}
         </div>
 
-        <div className="page-stack">
-          {/* Revenue Analysis */}
-          {revenue && (
-            <RevenueAnalysisCard
-              revenueOverTime={revenue.revenueOverTime}
-              serviceBreakdown={revenue.serviceBreakdown}
-              totalRevenue={revenue.totalRevenue}
-            />
-          )}
-
-          {/* Logistics Analysis */}
-          {logistics && (
-            <LogisticsAnalysisCard
-              summary={logistics.summary}
-              costDistanceAnalysis={logistics.costDistanceAnalysis}
-            />
-          )}
-        </div>
+        {customers && (
+          <div className="reports-row reports-row--full">
+            <CustomerValueCard topCustomers={customers.topCustomers} />
+          </div>
+        )}
       </div>
-
-      {/* Customer Lifetime Value - Full Width */}
-      {customers && <CustomerValueCard topCustomers={customers.topCustomers} />}
     </div>
   );
 }
