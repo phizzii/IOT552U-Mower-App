@@ -1,5 +1,7 @@
 import { formatCurrency, formatDate } from '../../utils/formatters';
 
+const NEW_PART_OPTION = '__create__';
+
 function renderAddress(customer) {
   return [
     customer?.address_line_1,
@@ -87,7 +89,7 @@ function JobDetailPanel({
               <select
                 className="field-control"
                 onChange={(event) => {
-                  if (event.target.value === '__create__') {
+                  if (event.target.value === NEW_PART_OPTION) {
                     onPartDraftChange('part_id', '');
                     onOpenCreatePart();
                     return;
@@ -103,7 +105,7 @@ function JobDetailPanel({
                     {[part.part_description, part.brand].filter(Boolean).join(' · ')}
                   </option>
                 ))}
-                <option value="__create__">+ Add a new part</option>
+                <option value={NEW_PART_OPTION}>+ Add a new part</option>
               </select>
             </label>
             <label className="field-group narrow">

@@ -28,8 +28,15 @@ function PartsList({ onDelete, onEdit, onView, parts }) {
         </div>
       ) : (
         <div className="record-list">
-          {filteredParts.map((part) => (
-            <ExpandableRecord
+          {filteredParts.map((part) => {
+            const supplierCost = Number(part.supplier_cost) || 0;
+            const retailPrice = Number(part.retail_price) || 0;
+            const margin = retailPrice - supplierCost;
+            const marginPercent =
+              supplierCost > 0 ? `${((margin / supplierCost) * 100).toFixed(0)}%` : 'N/A';
+
+            return (
+              <ExpandableRecord
               actions={
                 <>
                   <button
@@ -71,7 +78,7 @@ function PartsList({ onDelete, onEdit, onView, parts }) {
                 setOpenPartId((current) => (current === part.part_id ? null : part.part_id))
               }
               subtitle={[part.brand, part.supplier_name].filter(Boolean).join(' · ') || 'No supplier'}
-              summary={`£${Number(part.retail_price).toFixed(2)}`}
+              summary={`£${retailPrice.toFixed(2)}`}
               title={part.part_description}
             >
               <div className="record-detail-grid">
@@ -81,25 +88,24 @@ function PartsList({ onDelete, onEdit, onView, parts }) {
                 </div>
                 <div className="record-detail-item">
                   <span className="record-detail-label">Supplier cost</span>
-                  <strong>£{Number(part.supplier_cost).toFixed(2)}</strong>
+                  <strong>£{supplierCost.toFixed(2)}</strong>
                 </div>
                 <div className="record-detail-item">
                   <span className="record-detail-label">Retail price</span>
-                  <strong>£{Number(part.retail_price).toFixed(2)}</strong>
+                  <strong>£{retailPrice.toFixed(2)}</strong>
                 </div>
                 <div className="record-detail-item">
                   <span className="record-detail-label">Margin</span>
                   <strong>
-                    £{(part.retail_price - part.supplier_cost).toFixed(2)} (
-                    {Number(part.supplier_cost) > 0
-                      ? `${(((part.retail_price - part.supplier_cost) / part.supplier_cost) * 100).toFixed(0)}%`
-                      : 'N/A'}
+                    £{margin.toFixed(2)} (
+                    {marginPercent}
                     )
                   </strong>
                 </div>
               </div>
             </ExpandableRecord>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
