@@ -58,28 +58,26 @@ function InvoicesPage() {
       {actionError ? <div className="feedback-banner error">{actionError}</div> : null}
       {actionMessage ? <div className="feedback-banner success">{actionMessage}</div> : null}
 
-      <div className="page-grid">
-        <div className="page-stack">
-          <ModuleActionCard
-            actionLabel="+ New Invoice"
-            onAction={openCreate}
-            sectionLabel="Billing"
-            title="Invoice Records"
-          />
+      <div className="page-stack page-stack--wide">
+        <ModuleActionCard
+          actionLabel="+ New Invoice"
+          onAction={openCreate}
+          sectionLabel="Billing"
+          title="Invoice Records"
+        />
 
-          {isLoading ? (
-            <div className="surface-card">
-              <div className="loading-state">Loading invoices...</div>
-            </div>
-          ) : (
-            <InvoicesList
-              invoices={invoices}
-              onDelete={deleteItem}
-              onEdit={openEdit}
-              onView={openDetail}
-            />
-          )}
-        </div>
+        {isLoading ? (
+          <div className="surface-card">
+            <div className="loading-state">Loading invoices...</div>
+          </div>
+        ) : (
+          <InvoicesList
+            invoices={invoices}
+            onDelete={deleteItem}
+            onEdit={openEdit}
+            onView={openDetail}
+          />
+        )}
       </div>
 
       <InvoiceForm

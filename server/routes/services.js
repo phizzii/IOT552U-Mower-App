@@ -11,6 +11,7 @@ const {
   run,
   sendValidationErrors,
   validateIdParam,
+  withTransaction,
 } = require('../utils/routeHelpers');
 
 function getServicePayload(body) {
@@ -153,8 +154,10 @@ router.delete(
       return;
     }
 
-    const sql = 'DELETE FROM Service WHERE service_id = ?';
-    const result = await run(db, sql, [id]);
+    const result = await withTransaction(db, async () => {
+      await run(db, 'DELETE FROM Job_Line_Item WHERE service_id = ?', [id]);
+      return run(db, 'DELETE FROM Service WHERE service_id = ?', [id]);
+    });
 
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Service not found' });

@@ -4,6 +4,7 @@ const db = require('../db/db');
 const {
   all,
   asyncHandler,
+  findBlockingReference,
   getOne,
   parseInteger,
   parseText,
@@ -174,6 +175,18 @@ router.delete(
 
     if (sendValidationErrors(res, errors)) {
       return;
+    }
+
+    const blockingReference = await findBlockingReference(db, id, [
+      {
+        column: 'machine_id',
+        message: 'Remove linked repair jobs before deleting this machine.',
+        table: 'Repair_Job',
+      },
+    ]);
+
+    if (blockingReference) {
+      return res.status(409).json({ error: blockingReference.message });
     }
 
     const sql = 'DELETE FROM Machine WHERE machine_id = ?';

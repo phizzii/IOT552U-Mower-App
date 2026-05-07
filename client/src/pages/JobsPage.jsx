@@ -10,6 +10,7 @@ import JobsFilterBar from '../components/jobs/JobsFilterBar';
 import JobsTable from '../components/jobs/JobsTable';
 import JobWizard from '../components/jobs/JobWizard';
 import PageHeader from '../components/navigation/PageHeader';
+import PartForm from '../components/parts/PartForm';
 import { fetchJson } from '../utils/api';
 
 const emptyWorkspace = {
@@ -105,8 +106,11 @@ function JobsPage() {
   const [filters, setFilters] = useState(initialFilters);
   const [invoiceDraft, setInvoiceDraft] = useState(initialInvoiceDraft);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPartFormOpen, setIsPartFormOpen] = useState(false);
+  const [isPartFormSubmitting, setIsPartFormSubmitting] = useState(false);
   const [isWizardSubmitting, setIsWizardSubmitting] = useState(false);
   const [partDraft, setPartDraft] = useState(initialPartDraft);
+  const [partFormError, setPartFormError] = useState('');
   const [selectedJobId, setSelectedJobId] = useState(null);
   const [serviceDraft, setServiceDraft] = useState(initialServiceDraft);
   const [statusDraft, setStatusDraft] = useState('Logged');
@@ -287,6 +291,16 @@ function JobsPage() {
     }));
   }
 
+  function openCreatePartForm() {
+    setPartFormError('');
+    setIsPartFormOpen(true);
+  }
+
+  function closeCreatePartForm() {
+    setIsPartFormOpen(false);
+    setPartFormError('');
+  }
+
   async function handleJobWizardSubmit(formState) {
     setIsWizardSubmitting(true);
     setActionError('');
@@ -419,6 +433,31 @@ function JobsPage() {
       setActionError(partError.message || 'The part could not be added to the job.');
     } finally {
       setBusyAction('');
+    }
+  }
+
+  async function handleCreatePart(partData) {
+    setIsPartFormSubmitting(true);
+    setPartFormError('');
+
+    try {
+      const result = await fetchJson('/parts', {
+        body: JSON.stringify(partData),
+        method: 'POST',
+      });
+
+      closeCreatePartForm();
+      setActionMessage('Part created successfully.');
+      setPartDraft((current) => ({
+        ...current,
+        charge_price: String(partData.retail_price),
+        part_id: String(result.part_id),
+      }));
+      await loadWorkspace(selectedJob?.job_no);
+    } catch (partError) {
+      setPartFormError(partError.message || 'The part could not be created.');
+    } finally {
+      setIsPartFormSubmitting(false);
     }
   }
 
@@ -557,6 +596,7 @@ function JobsPage() {
           onAddPart={handleAddPart}
           onAddService={handleAddService}
           onEditJob={() => openWizard('edit', selectedJob)}
+          onOpenCreatePart={openCreatePartForm}
           onGenerateInvoice={handleGenerateInvoice}
           onInvoiceDraftChange={(field, value) =>
             setInvoiceDraft((current) => ({
@@ -597,6 +637,16 @@ function JobsPage() {
         mode={wizardState.mode}
         onClose={closeWizard}
         onSubmit={handleJobWizardSubmit}
+      />
+
+      <PartForm
+        error={partFormError}
+        isOpen={isPartFormOpen}
+        isSubmitting={isPartFormSubmitting}
+        mode="create"
+        onClose={closeCreatePartForm}
+        onSubmit={handleCreatePart}
+        part={null}
       />
     </div>
   );

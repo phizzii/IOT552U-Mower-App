@@ -42,28 +42,26 @@ function CustomersPage() {
       {actionError ? <div className="feedback-banner error">{actionError}</div> : null}
       {actionMessage ? <div className="feedback-banner success">{actionMessage}</div> : null}
 
-      <div className="page-grid">
-        <div className="page-stack">
-          <ModuleActionCard
-            actionLabel="+ New Customer"
-            onAction={openCreate}
-            sectionLabel="Customers"
-            title="Customer Records"
-          />
+      <div className="page-stack page-stack--wide">
+        <ModuleActionCard
+          actionLabel="+ New Customer"
+          onAction={openCreate}
+          sectionLabel="Customers"
+          title="Customer Records"
+        />
 
-          {isLoading ? (
-            <div className="surface-card">
-              <div className="loading-state">Loading customers...</div>
-            </div>
-          ) : (
-            <CustomersList
-              customers={customers}
-              onDelete={deleteItem}
-              onEdit={openEdit}
-              onView={openDetail}
-            />
-          )}
-        </div>
+        {isLoading ? (
+          <div className="surface-card">
+            <div className="loading-state">Loading customers...</div>
+          </div>
+        ) : (
+          <CustomersList
+            customers={customers}
+            onDelete={deleteItem}
+            onEdit={openEdit}
+            onView={openDetail}
+          />
+        )}
       </div>
 
       <CustomerForm

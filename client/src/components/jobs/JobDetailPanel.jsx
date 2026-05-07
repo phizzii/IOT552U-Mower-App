@@ -1,5 +1,7 @@
 import { formatCurrency, formatDate } from '../../utils/formatters';
 
+const NEW_PART_OPTION = '__create__';
+
 function renderAddress(customer) {
   return [
     customer?.address_line_1,
@@ -25,6 +27,7 @@ function JobDetailPanel({
   onAddPart,
   onAddService,
   onEditJob,
+  onOpenCreatePart,
   onGenerateInvoice,
   onInvoiceDraftChange,
   onPartDraftChange,
@@ -85,15 +88,24 @@ function JobDetailPanel({
               <span className="field-label">Part</span>
               <select
                 className="field-control"
-                onChange={(event) => onPartDraftChange('part_id', event.target.value)}
+                onChange={(event) => {
+                  if (event.target.value === NEW_PART_OPTION) {
+                    onPartDraftChange('part_id', '');
+                    onOpenCreatePart();
+                    return;
+                  }
+
+                  onPartDraftChange('part_id', event.target.value);
+                }}
                 value={partDraft.part_id}
               >
                 <option value="">Select a part</option>
                 {parts.map((part) => (
                   <option key={part.part_id} value={part.part_id}>
-                    {part.part_description}
+                    {[part.part_description, part.brand].filter(Boolean).join(' · ')}
                   </option>
                 ))}
+                <option value={NEW_PART_OPTION}>+ Add a new part</option>
               </select>
             </label>
             <label className="field-group narrow">
@@ -240,174 +252,174 @@ function JobDetailPanel({
         {actionError ? <div className="feedback-banner error">{actionError}</div> : null}
 
         <div className="job-detail-grid">
-          <article className="detail-block">
-            <h3>Job Info</h3>
-            <dl className="detail-list">
-              <div>
-                <dt>Status</dt>
-                <dd>{job.status || 'Unspecified'}</dd>
-              </div>
-              <div>
-                <dt>Assigned mechanic</dt>
-                <dd>{job.assigned_mechanic || 'Unassigned'}</dd>
-              </div>
-              <div>
-                <dt>Logged</dt>
-                <dd>{formatDate(job.date_logged)}</dd>
-              </div>
-              <div>
-                <dt>Planned return</dt>
-                <dd>{formatDate(job.date_return)}</dd>
-              </div>
-              <div>
-                <dt>Contact method</dt>
-                <dd>{job.contact_method || 'Not set'}</dd>
-              </div>
-              <div>
-                <dt>Notes</dt>
-                <dd>{job.notes || 'No notes recorded yet.'}</dd>
-              </div>
-            </dl>
-            <div className="status-update-row">
-              <select
-                className="field-control"
-                onChange={(event) => onStatusDraftChange(event.target.value)}
-                value={statusDraft}
-              >
-                <option value="Logged">Logged</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Awaiting Parts">Awaiting Parts</option>
-                <option value="Ready for Collection">Ready for Collection</option>
-                <option value="Completed">Completed</option>
-                <option value="Collected">Collected</option>
-              </select>
-              <button
-                className="primary-button"
-                disabled={busyAction === 'status'}
-                onClick={onSaveStatus}
-                type="button"
-              >
-                {busyAction === 'status' ? 'Saving...' : 'Update Status'}
-              </button>
-            </div>
-          </article>
-
-          <article className="detail-block">
-            <h3>Customer Info</h3>
-            <dl className="detail-list">
-              <div>
-                <dt>Name</dt>
-                <dd>{customer ? `${customer.first_name} ${customer.last_name}` : 'Unknown customer'}</dd>
-              </div>
-              <div>
-                <dt>Phone</dt>
-                <dd>{customer?.phone_number || 'Not set'}</dd>
-              </div>
-              <div>
-                <dt>Address</dt>
-                <dd>{customer ? renderAddress(customer) : 'No address available'}</dd>
-              </div>
-            </dl>
-          </article>
-
-          <article className="detail-block">
-            <h3>Machine Info</h3>
-            <dl className="detail-list">
-              <div>
-                <dt>Make</dt>
-                <dd>{machine?.make || job.machine_make || 'Unknown'}</dd>
-              </div>
-              <div>
-                <dt>Model</dt>
-                <dd>{machine?.model_no || job.machine_model_no || 'Unknown'}</dd>
-              </div>
-              <div>
-                <dt>Serial</dt>
-                <dd>{machine?.serial_no || job.machine_serial_no || 'Not set'}</dd>
-              </div>
-              <div>
-                <dt>Type</dt>
-                <dd>{machine?.machine_type_name || 'Not linked yet'}</dd>
-              </div>
-            </dl>
-          </article>
-
-          <article className="detail-block">
-            <h3>Invoice Summary</h3>
-            <div className="summary-metric-row">
-              <div className="metric-chip compact">
-                <strong>{formatCurrency(totals.partsTotal)}</strong>
-                <span>Parts total</span>
-              </div>
-              <div className="metric-chip compact">
-                <strong>{formatCurrency(totals.servicesTotal)}</strong>
-                <span>Labour total</span>
-              </div>
-              <div className="metric-chip compact">
-                <strong>{formatCurrency(totals.grandTotal)}</strong>
-                <span>Suggested invoice</span>
-              </div>
-            </div>
-
-            <div className="invoice-list">
-              {invoices.length === 0 ? (
-                <span className="muted-copy">No invoice has been created for this job yet.</span>
-              ) : (
-                invoices.map((invoice) => (
-                  <div className="line-item-row" key={invoice.invoice_no}>
-                    <strong>Invoice #{invoice.invoice_no}</strong>
-                    <span>
-                      {formatCurrency(invoice.total_cost)} · {invoice.date_paid ? 'Paid' : 'Awaiting payment'}
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-
-            <form
-              className="inline-form"
-              onSubmit={(event) => {
-                event.preventDefault();
-                onGenerateInvoice();
-              }}
-            >
-              <label className="field-group">
-                <span className="field-label">Payment type</span>
-                <input
+          <div className="job-detail-stack">
+            <article className="detail-block">
+              <h3>Job Info</h3>
+              <dl className="detail-list">
+                <div>
+                  <dt>Status</dt>
+                  <dd>{job.status || 'Unspecified'}</dd>
+                </div>
+                <div>
+                  <dt>Logged</dt>
+                  <dd>{formatDate(job.date_logged)}</dd>
+                </div>
+                <div>
+                  <dt>Planned return</dt>
+                  <dd>{formatDate(job.date_return)}</dd>
+                </div>
+                <div>
+                  <dt>Contact method</dt>
+                  <dd>{job.contact_method || 'Not set'}</dd>
+                </div>
+                <div>
+                  <dt>Notes</dt>
+                  <dd>{job.notes || 'No notes recorded yet.'}</dd>
+                </div>
+              </dl>
+              <div className="status-update-row">
+                <select
                   className="field-control"
-                  onChange={(event) => onInvoiceDraftChange('payment_type', event.target.value)}
-                  value={invoiceDraft.payment_type}
-                />
-              </label>
-              <label className="field-group">
-                <span className="field-label">Paid date</span>
-                <input
-                  className="field-control"
-                  onChange={(event) => onInvoiceDraftChange('date_paid', event.target.value)}
-                  type="date"
-                  value={invoiceDraft.date_paid}
-                />
-              </label>
-              <label className="field-group">
-                <span className="field-label">Invoice total</span>
-                <input
-                  className="field-control"
-                  min="0"
-                  onChange={(event) => onInvoiceDraftChange('total_cost', event.target.value)}
-                  step="0.01"
-                  type="number"
-                  value={invoiceDraft.total_cost}
-                />
-              </label>
-              <button
-                className="primary-button"
-                disabled={busyAction === 'invoice'}
-                type="submit"
+                  onChange={(event) => onStatusDraftChange(event.target.value)}
+                  value={statusDraft}
+                >
+                  <option value="Logged">Logged</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Awaiting Parts">Awaiting Parts</option>
+                  <option value="Ready for Collection">Ready for Collection</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Collected">Collected</option>
+                </select>
+                <button
+                  className="primary-button"
+                  disabled={busyAction === 'status'}
+                  onClick={onSaveStatus}
+                  type="button"
+                >
+                  {busyAction === 'status' ? 'Saving...' : 'Update Status'}
+                </button>
+              </div>
+            </article>
+
+            <article className="detail-block">
+              <h3>Machine Info</h3>
+              <dl className="detail-list">
+                <div>
+                  <dt>Make</dt>
+                  <dd>{machine?.make || job.machine_make || 'Unknown'}</dd>
+                </div>
+                <div>
+                  <dt>Model</dt>
+                  <dd>{machine?.model_no || job.machine_model_no || 'Unknown'}</dd>
+                </div>
+                <div>
+                  <dt>Serial</dt>
+                  <dd>{machine?.serial_no || job.machine_serial_no || 'Not set'}</dd>
+                </div>
+                <div>
+                  <dt>Type</dt>
+                  <dd>{machine?.machine_type_name || 'Not linked yet'}</dd>
+                </div>
+              </dl>
+            </article>
+          </div>
+
+          <div className="job-detail-stack">
+            <article className="detail-block">
+              <h3>Customer Info</h3>
+              <dl className="detail-list">
+                <div>
+                  <dt>Name</dt>
+                  <dd>{customer ? `${customer.first_name} ${customer.last_name}` : 'Unknown customer'}</dd>
+                </div>
+                <div>
+                  <dt>Phone</dt>
+                  <dd>{customer?.phone_number || 'Not set'}</dd>
+                </div>
+                <div>
+                  <dt>Address</dt>
+                  <dd>{customer ? renderAddress(customer) : 'No address available'}</dd>
+                </div>
+              </dl>
+            </article>
+
+            <article className="detail-block">
+              <h3>Invoice Summary</h3>
+              <div className="summary-metric-row">
+                <div className="metric-chip compact">
+                  <strong>{formatCurrency(totals.partsTotal)}</strong>
+                  <span>Parts total</span>
+                </div>
+                <div className="metric-chip compact">
+                  <strong>{formatCurrency(totals.servicesTotal)}</strong>
+                  <span>Labour total</span>
+                </div>
+                <div className="metric-chip compact">
+                  <strong>{formatCurrency(totals.grandTotal)}</strong>
+                  <span>Suggested invoice</span>
+                </div>
+              </div>
+
+              <div className="invoice-list">
+                {invoices.length === 0 ? (
+                  <span className="muted-copy">No invoice has been created for this job yet.</span>
+                ) : (
+                  invoices.map((invoice) => (
+                    <div className="line-item-row" key={invoice.invoice_no}>
+                      <strong>Invoice #{invoice.invoice_no}</strong>
+                      <span>
+                        {formatCurrency(invoice.total_cost)} · {invoice.date_paid ? 'Paid' : 'Awaiting payment'}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <form
+                className="inline-form"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  onGenerateInvoice();
+                }}
               >
-                {busyAction === 'invoice' ? 'Generating...' : 'Generate Invoice'}
-              </button>
-            </form>
-          </article>
+                <label className="field-group">
+                  <span className="field-label">Payment type</span>
+                  <input
+                    className="field-control"
+                    onChange={(event) => onInvoiceDraftChange('payment_type', event.target.value)}
+                    value={invoiceDraft.payment_type}
+                  />
+                </label>
+                <label className="field-group">
+                  <span className="field-label">Paid date</span>
+                  <input
+                    className="field-control"
+                    onChange={(event) => onInvoiceDraftChange('date_paid', event.target.value)}
+                    type="date"
+                    value={invoiceDraft.date_paid}
+                  />
+                </label>
+                <label className="field-group">
+                  <span className="field-label">Invoice total</span>
+                  <input
+                    className="field-control"
+                    min="0"
+                    onChange={(event) => onInvoiceDraftChange('total_cost', event.target.value)}
+                    step="0.01"
+                    type="number"
+                    value={invoiceDraft.total_cost}
+                  />
+                </label>
+                <button
+                  className="primary-button"
+                  disabled={busyAction === 'invoice'}
+                  type="submit"
+                >
+                  {busyAction === 'invoice' ? 'Generating...' : 'Generate Invoice'}
+                </button>
+              </form>
+            </article>
+          </div>
         </div>
       </section>
     </section>

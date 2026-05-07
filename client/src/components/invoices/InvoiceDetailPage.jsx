@@ -32,11 +32,12 @@ function InvoiceDetailPage({ invoiceId, onClose, onEdit }) {
   }
 
   return (
-    <div className="form-overlay" role="dialog" aria-modal="true">
-      <button aria-label="Close invoice details" className="form-backdrop" onClick={onClose} type="button" />
-      <section className="form-panel detail-panel">
-        <div className="form-header">
+    <div className="detail-overlay" role="dialog" aria-modal="true">
+      <button aria-label="Close invoice details" className="detail-backdrop" onClick={onClose} type="button" />
+      <section className="detail-panel">
+        <div className="detail-header">
           <div>
+            <span className="section-label">Invoice Record</span>
             <h3 className="form-title">Invoice #{invoiceId}</h3>
           </div>
           <button aria-label="Close details" className="close-button" onClick={onClose} type="button">
@@ -51,38 +52,59 @@ function InvoiceDetailPage({ invoiceId, onClose, onEdit }) {
         ) : (
           invoice && (
             <div className="detail-body">
-              <div className="detail-section">
-                <h4 className="section-title">Customer</h4>
-                <p>{invoice.customer_first_name} {invoice.customer_last_name}</p>
-              </div>
+              <section className="detail-section surface-card">
+                <div className="section-label">Customer</div>
+                <div className="detail-rows">
+                  <div className="detail-row">
+                    <span className="label">Name</span>
+                    <span className="value">
+                      {invoice.customer_first_name} {invoice.customer_last_name}
+                    </span>
+                  </div>
+                </div>
+              </section>
 
-              <div className="detail-section">
-                <h4 className="section-title">Invoice Summary</h4>
-                <div className="detail-row">
-                  <span>Amount</span>
-                  <span>{formatCurrency(invoice.total_cost)}</span>
+              <section className="detail-section surface-card">
+                <div className="section-label">Invoice Summary</div>
+                <div className="detail-rows">
+                  <div className="detail-row">
+                    <span className="label">Amount</span>
+                    <span className="value">{formatCurrency(invoice.total_cost)}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="label">Payment type</span>
+                    <span className="value">{invoice.payment_type || 'Not specified'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="label">Date paid</span>
+                    <span className="value">
+                      {invoice.date_paid ? formatDate(invoice.date_paid) : 'Pending'}
+                    </span>
+                  </div>
                 </div>
-                <div className="detail-row">
-                  <span>Payment type</span>
-                  <span>{invoice.payment_type || 'Not specified'}</span>
-                </div>
-                <div className="detail-row">
-                  <span>Date paid</span>
-                  <span>{invoice.date_paid ? formatDate(invoice.date_paid) : 'Pending'}</span>
-                </div>
-              </div>
+              </section>
 
-              <div className="detail-section">
-                <h4 className="section-title">Reference</h4>
-                <div className="detail-row">
-                  <span>Repair job</span>
-                  <span>{invoice.job_no ? `#${invoice.job_no} (${invoice.repair_job_status || 'Unknown'})` : 'None'}</span>
+              <section className="detail-section surface-card">
+                <div className="section-label">Reference</div>
+                <div className="detail-rows">
+                  <div className="detail-row">
+                    <span className="label">Repair job</span>
+                    <span className="value">
+                      {invoice.job_no
+                        ? `#${invoice.job_no} (${invoice.repair_job_status || 'Unknown'})`
+                        : 'None'}
+                    </span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="label">Sale item</span>
+                    <span className="value">
+                      {invoice.sale_item_no
+                        ? `#${invoice.sale_item_no} (${invoice.sale_item_details || 'Details unavailable'})`
+                        : 'None'}
+                    </span>
+                  </div>
                 </div>
-                <div className="detail-row">
-                  <span>Sale item</span>
-                  <span>{invoice.sale_item_no ? `#${invoice.sale_item_no} (${invoice.sale_item_details || 'Details unavailable'})` : 'None'}</span>
-                </div>
-              </div>
+              </section>
             </div>
           )
         )}

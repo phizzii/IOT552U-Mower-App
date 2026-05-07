@@ -56,30 +56,27 @@ function MachinesPage() {
       {actionError ? <div className="feedback-banner error">{actionError}</div> : null}
       {actionMessage ? <div className="feedback-banner success">{actionMessage}</div> : null}
 
-      <div className="page-grid">
-        <div className="page-stack">
-          <ModuleActionCard
-            actionLabel="+ New Machine"
-            onAction={openCreate}
-            sectionLabel="Equipment"
-            title="Machine Records"
-          />
+      <div className="page-stack page-stack--wide">
+        <ModuleActionCard
+          actionLabel="+ New Machine"
+          onAction={openCreate}
+          sectionLabel="Equipment"
+          title="Machine Records"
+        />
 
-          {isLoading ? (
-            <div className="surface-card">
-              <div className="loading-state">Loading machines...</div>
-            </div>
+        {isLoading ? (
+          <div className="surface-card">
+            <div className="loading-state">Loading machines...</div>
+          </div>
           ) : (
             <MachinesList
-              customers={customers}
               machineTypes={machineTypes}
               machines={machines}
               onDelete={deleteItem}
-              onEdit={openEdit}
-              onView={openDetail}
-            />
-          )}
-        </div>
+            onEdit={openEdit}
+            onView={openDetail}
+          />
+        )}
       </div>
 
       <MachineForm
