@@ -9,6 +9,7 @@ import JobsPage from './pages/JobsPage';
 import MachinesPage from './pages/MachinesPage';
 import PartsPage from './pages/PartsPage';
 import ReportsPage from './pages/ReportsPage';
+import SalesPage from './pages/SalesPage';
 import ServicesPage from './pages/ServicesPage';
 import SettingsPage from './pages/SettingsPage';
 
@@ -18,9 +19,10 @@ const navigationItems = [
   { label: 'Customers', shortLabel: 'Cust', to: '/customers' },
   { label: 'Machines', shortLabel: 'Mach', to: '/machines' },
   { label: 'Parts', shortLabel: 'Parts', to: '/parts' },
+  { label: 'Sales', shortLabel: 'Sales', to: '/sales' },
   { label: 'Services', shortLabel: 'Serv', to: '/services' },
   { label: 'Invoices', shortLabel: 'Inv', to: '/invoices' },
-  { label: 'Deliveries', shortLabel: 'Del', to: '/deliveries' },
+  { label: 'Del / Coll', shortLabel: 'Route', to: '/deliveries' },
   { label: 'Reports', shortLabel: 'Rpt', to: '/reports' },
   { label: 'Settings', shortLabel: 'Cfg', to: '/settings' },
 ];
@@ -41,6 +43,7 @@ function App() {
           <Route path="customers" element={<CustomersPage />} />
           <Route path="machines" element={<MachinesPage />} />
           <Route path="parts" element={<PartsPage />} />
+          <Route path="sales" element={<SalesPage />} />
           <Route path="services" element={<ServicesPage />} />
           <Route path="invoices" element={<InvoicesPage />} />
           <Route path="deliveries" element={<DeliveriesPage />} />

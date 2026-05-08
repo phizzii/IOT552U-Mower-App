@@ -118,7 +118,7 @@ router.post(
         contact_method,
         date_return
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const result = await run(db, sql, [
@@ -204,6 +204,7 @@ router.delete(
 
       for (const invoice of invoices) {
         await run(db, 'DELETE FROM Delivery WHERE invoice_no = ?', [invoice.invoice_no]);
+        await run(db, 'DELETE FROM Invoice_Sale_Item WHERE invoice_no = ?', [invoice.invoice_no]);
       }
 
       await run(db, 'DELETE FROM Invoice WHERE job_no = ?', [id]);

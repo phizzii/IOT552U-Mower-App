@@ -96,10 +96,19 @@ function InvoiceDetailPage({ invoiceId, onClose, onEdit }) {
                     </span>
                   </div>
                   <div className="detail-row">
-                    <span className="label">Sale item</span>
+                    <span className="label">Sale items</span>
                     <span className="value">
-                      {invoice.sale_item_no
-                        ? `#${invoice.sale_item_no} (${invoice.sale_item_details || 'Details unavailable'})`
+                      {invoice.sale_items?.length
+                        ? invoice.sale_items
+                            .map((item) => {
+                              const label =
+                                item.details ||
+                                [item.make, item.model].filter(Boolean).join(' ') ||
+                                `#${item.sale_item_no}`;
+
+                              return item.quantity > 1 ? `${label} x${item.quantity}` : label;
+                            })
+                            .join(', ')
                         : 'None'}
                     </span>
                   </div>
@@ -115,7 +124,10 @@ function InvoiceDetailPage({ invoiceId, onClose, onEdit }) {
           </button>
           <button
             className="primary-button"
-            onClick={() => onEdit(invoiceId)}
+            onClick={() => {
+              onClose();
+              onEdit(invoiceId);
+            }}
             type="button"
           >
             Edit Invoice

@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
+import usePagination from '../../hooks/usePagination';
 import ExpandableRecord from '../shared/ExpandableRecord';
+import PaginationControls from '../shared/PaginationControls';
 
 function renderAddress(customer) {
   return [
@@ -41,6 +43,16 @@ function CustomersList({
       );
     });
   }, [customers, searchTerm]);
+  const {
+    currentPage,
+    paginatedItems,
+    range,
+    setCurrentPage,
+    totalItems,
+    totalPages,
+  } = usePagination(filteredCustomers, {
+    resetKeys: [searchTerm],
+  });
 
   return (
     <section className="surface-card customers-list-card" data-reveal="customers-list">
@@ -74,8 +86,9 @@ function CustomersList({
           </span>
         </div>
       ) : (
+        <>
         <div className="record-list">
-          {filteredCustomers.map((customer) => (
+          {paginatedItems.map((customer) => (
             <ExpandableRecord
               actions={
                 <>
@@ -136,6 +149,14 @@ function CustomersList({
             </ExpandableRecord>
           ))}
         </div>
+        <PaginationControls
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          range={range}
+          totalItems={totalItems}
+          totalPages={totalPages}
+        />
+        </>
       )}
     </section>
   );

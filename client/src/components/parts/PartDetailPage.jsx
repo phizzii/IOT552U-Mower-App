@@ -78,7 +78,7 @@ function PartDetailPage({ onClose, onEdit, partId }) {
             <span className="section-label">Part Record</span>
             <h3 className="detail-title">{part.part_description}</h3>
             <p className="detail-subtitle">
-              {[part.brand, part.supplier_name].filter(Boolean).join(' · ') || 'No supplier'}
+              {part.supplier_name || 'No supplier'}
             </p>
           </div>
           <div className="detail-actions">
@@ -107,10 +107,6 @@ function PartDetailPage({ onClose, onEdit, partId }) {
               <div className="detail-row">
                 <span className="label">Description</span>
                 <span className="value">{part.part_description}</span>
-              </div>
-              <div className="detail-row">
-                <span className="label">Brand</span>
-                <span className="value">{part.brand || 'Not set'}</span>
               </div>
               <div className="detail-row">
                 <span className="label">Supplier</span>

@@ -1444,6 +1444,17 @@ textarea {
   gap: 8px;
 }
 
+.filters-row {
+  align-items: end;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 240px);
+}
+
+.search-field-group {
+  min-width: 0;
+}
+
 .field-group {
   display: grid;
   gap: 8px;
@@ -1484,6 +1495,12 @@ textarea {
 .field-textarea {
   min-height: 132px;
   resize: vertical;
+}
+
+.field-helper {
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.45;
 }
 
 .primary-button,
@@ -1746,8 +1763,15 @@ textarea {
   border: 1px solid rgba(48, 92, 71, 0.09);
   border-radius: 18px;
   display: grid;
-  gap: 4px;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
   padding: 14px 16px;
+}
+
+.line-item-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
 }
 
 .line-item-row strong {
@@ -1758,6 +1782,17 @@ textarea {
 .muted-copy {
   color: var(--ink-soft);
   line-height: 1.5;
+}
+
+.parts-list-card,
+.customers-list-card,
+.machines-list-card,
+.sales-list-card,
+.services-list-card,
+.invoices-list-card {
+  display: grid;
+  gap: 18px;
+  overflow: hidden;
 }
 
 .record-list {
@@ -1776,6 +1811,74 @@ textarea {
   background: rgba(255, 255, 255, 0.9);
   border-color: rgba(48, 92, 71, 0.18);
   box-shadow: 0 18px 34px rgba(36, 44, 35, 0.08);
+}
+
+.form-panel::-webkit-scrollbar,
+.detail-panel::-webkit-scrollbar,
+.wizard-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.form-panel::-webkit-scrollbar-track,
+.detail-panel::-webkit-scrollbar-track,
+.wizard-panel::-webkit-scrollbar-track {
+  background: rgba(48, 92, 71, 0.06);
+  border-radius: 999px;
+}
+
+.form-panel::-webkit-scrollbar-thumb,
+.detail-panel::-webkit-scrollbar-thumb,
+.wizard-panel::-webkit-scrollbar-thumb {
+  background: rgba(48, 92, 71, 0.22);
+  border-radius: 999px;
+}
+
+.form-panel::-webkit-scrollbar-thumb:hover,
+.detail-panel::-webkit-scrollbar-thumb:hover,
+.wizard-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(48, 92, 71, 0.34);
+}
+
+.pagination-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.pagination-summary {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.pagination-controls,
+.pagination-pages {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pagination-page-button {
+  align-items: center;
+  background: rgba(48, 92, 71, 0.05);
+  border: 1px solid rgba(48, 92, 71, 0.12);
+  border-radius: 999px;
+  color: var(--accent-strong);
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 700;
+  height: 42px;
+  justify-content: center;
+  min-width: 42px;
+  padding: 0 12px;
+}
+
+.pagination-page-button.is-active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  border-color: transparent;
+  color: #f7f3eb;
 }
 
 .record-card-bar {
@@ -1873,10 +1976,11 @@ textarea {
 
 .form-overlay,
 .detail-overlay {
-  align-items: center;
+  align-items: start;
   display: grid;
   inset: 0;
   justify-items: center;
+  overflow-y: auto;
   padding: 24px;
   position: fixed;
   z-index: 30;
@@ -1935,6 +2039,18 @@ textarea {
 .detail-section {
   display: grid;
   gap: 14px;
+}
+
+.invoice-sale-item-list {
+  display: grid;
+  gap: 12px;
+}
+
+.invoice-sale-item-row {
+  align-items: end;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) 120px auto;
 }
 
 .form-section-title {
@@ -2132,9 +2248,11 @@ textarea {
 }
 
 .wizard-overlay {
-  align-items: center;
+  align-items: start;
   display: grid;
   inset: 0;
+  justify-items: center;
+  overflow-y: auto;
   padding: 24px;
   position: fixed;
   z-index: 22;
@@ -2373,6 +2491,7 @@ textarea {
   }
 
   .jobs-filter-grid,
+  .filters-row,
   .inline-form,
   .parts-form,
   .service-form,
@@ -2430,6 +2549,7 @@ textarea {
   }
 
   .jobs-filter-grid,
+  .filters-row,
   .inline-form,
   .parts-form,
   .service-form,
@@ -2447,6 +2567,7 @@ textarea {
 
   .record-card-bar,
   .record-card-toggle,
+  .invoice-sale-item-row,
   .detail-row,
   .detail-rows .detail-row {
     grid-template-columns: 1fr;

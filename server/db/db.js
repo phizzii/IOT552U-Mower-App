@@ -15,7 +15,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
   }
 });
 
-function ensurePartBrandColumn() {
+function migratePartTableRemoveBrand() {
   db.all('PRAGMA table_info(Part)', (tableError, columns) => {
     if (tableError) {
       console.error('Could not inspect Part table:', tableError.message);
@@ -24,18 +24,53 @@ function ensurePartBrandColumn() {
 
     const hasBrandColumn = columns.some((column) => column.name === 'brand');
 
-    if (hasBrandColumn) {
+    if (!hasBrandColumn) {
       console.log('Database ready');
       return;
     }
 
-    db.run('ALTER TABLE Part ADD COLUMN brand TEXT', (alterError) => {
-      if (alterError) {
-        console.error('Could not add Part.brand column:', alterError.message);
-        return;
-      }
+    db.serialize(() => {
+      db.run('PRAGMA foreign_keys = OFF');
+      db.exec(
+        `
+          BEGIN TRANSACTION;
+          DROP TABLE IF EXISTS Part_new;
+          CREATE TABLE Part_new (
+            part_id INTEGER PRIMARY KEY,
+            part_description TEXT,
+            supplier_name TEXT,
+            supplier_cost REAL,
+            retail_price REAL
+          );
+          INSERT INTO Part_new (
+            part_id,
+            part_description,
+            supplier_name,
+            supplier_cost,
+            retail_price
+          )
+          SELECT
+            part_id,
+            part_description,
+            supplier_name,
+            supplier_cost,
+            retail_price
+          FROM Part;
+          DROP TABLE Part;
+          ALTER TABLE Part_new RENAME TO Part;
+          COMMIT;
+        `,
+        (migrationError) => {
+          db.run('PRAGMA foreign_keys = ON');
 
-      console.log('Database ready');
+          if (migrationError) {
+            console.error('Could not remove Part.brand column:', migrationError.message);
+            return;
+          }
+
+          console.log('Database ready');
+        }
+      );
     });
   });
 }
@@ -48,7 +83,7 @@ db.serialize(() => {
       return;
     }
 
-    ensurePartBrandColumn();
+    migratePartTableRemoveBrand();
   });
 });
 

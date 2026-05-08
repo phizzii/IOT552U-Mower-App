@@ -192,20 +192,20 @@ async function seed() {
       ['Ignition coil', 'Stihl', 'Engine Spares UK', 26, 52],
       ['Pull cord', 'Universal', 'ToolFix', 4, 10],
       ['Blade bolt', 'Universal', 'ToolFix', 2.5, 7],
-      ['Fuel cap', 'Honda', 'MowerTech Supplies', 7, 15],
-      ['Starter gear', 'Briggs & Stratton', 'Engine Spares UK', 16, 30],
-      ['Tyre', 'Carlisle', 'Agri Supplies', 34, 60],
-      ['Switch', 'Universal', 'ToolFix', 8, 18],
-      ['Carb gasket set', 'Walbro', 'Engine Spares UK', 5, 12],
-      ['Muffler', 'Stihl', 'Engine Spares UK', 27, 49],
+      ['Fuel cap', 'MowerTech Supplies', 7, 15],
+      ['Starter gear', 'Engine Spares UK', 16, 30],
+      ['Tyre', 'Agri Supplies', 34, 60],
+      ['Switch', 'ToolFix', 8, 18],
+      ['Carb gasket set', 'Engine Spares UK', 5, 12],
+      ['Muffler', 'Engine Spares UK', 27, 49],
     ];
  
-    for (const [description, brand, supplier, supplierCost, retailPrice] of parts) {
+    for (const [description, supplier, supplierCost, retailPrice] of parts) {
       await run(
         `INSERT INTO Part
-          (part_description, brand, supplier_name, supplier_cost, retail_price)
-         VALUES (?, ?, ?, ?, ?)`,
-        [description, brand, supplier, supplierCost, retailPrice]
+          (part_description, supplier_name, supplier_cost, retail_price)
+         VALUES (?, ?, ?, ?)`,
+        [description, supplier, supplierCost, retailPrice]
       );
     }
  

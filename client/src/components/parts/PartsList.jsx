@@ -1,11 +1,21 @@
 import { useMemo, useState } from 'react';
+import usePagination from '../../hooks/usePagination';
 import ExpandableRecord from '../shared/ExpandableRecord';
+import PaginationControls from '../shared/PaginationControls';
 
 function PartsList({ onDelete, onEdit, onView, parts }) {
   const [openPartId, setOpenPartId] = useState(null);
   const filteredParts = useMemo(() => {
     return parts;
   }, [parts]);
+  const {
+    currentPage,
+    paginatedItems,
+    range,
+    setCurrentPage,
+    totalItems,
+    totalPages,
+  } = usePagination(filteredParts);
 
   return (
     <div className="parts-list-card surface-card">
@@ -27,8 +37,9 @@ function PartsList({ onDelete, onEdit, onView, parts }) {
           </p>
         </div>
       ) : (
+        <>
         <div className="record-list">
-          {filteredParts.map((part) => {
+          {paginatedItems.map((part) => {
             const supplierCost = Number(part.supplier_cost) || 0;
             const retailPrice = Number(part.retail_price) || 0;
             const margin = retailPrice - supplierCost;
@@ -77,15 +88,11 @@ function PartsList({ onDelete, onEdit, onView, parts }) {
               onToggle={() =>
                 setOpenPartId((current) => (current === part.part_id ? null : part.part_id))
               }
-              subtitle={[part.brand, part.supplier_name].filter(Boolean).join(' · ') || 'No supplier'}
+              subtitle={part.supplier_name || 'No supplier'}
               summary={`£${retailPrice.toFixed(2)}`}
               title={part.part_description}
             >
               <div className="record-detail-grid">
-                <div className="record-detail-item">
-                  <span className="record-detail-label">Brand</span>
-                  <strong>{part.brand || 'Not set'}</strong>
-                </div>
                 <div className="record-detail-item">
                   <span className="record-detail-label">Supplier cost</span>
                   <strong>£{supplierCost.toFixed(2)}</strong>
@@ -107,6 +114,14 @@ function PartsList({ onDelete, onEdit, onView, parts }) {
             );
           })}
         </div>
+        <PaginationControls
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          range={range}
+          totalItems={totalItems}
+          totalPages={totalPages}
+        />
+        </>
       )}
     </div>
   );

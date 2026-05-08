@@ -67,6 +67,7 @@ function useCrudPage({
   }
 
   function openCreate() {
+    setDetailState(createInitialDetailState());
     setFormState({
       isOpen: true,
       isSubmitting: false,
@@ -86,6 +87,7 @@ function useCrudPage({
       return;
     }
 
+    setDetailState(createInitialDetailState());
     setFormState({
       isOpen: true,
       isSubmitting: false,

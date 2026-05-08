@@ -14,8 +14,6 @@ function renderAddress(customer) {
 }
 
 function JobDetailPanel({
-  actionError,
-  actionMessage,
   busyAction,
   customer,
   invoiceDraft,
@@ -26,6 +24,8 @@ function JobDetailPanel({
   machine,
   onAddPart,
   onAddService,
+  onDeleteJobPart,
+  onDeleteJobService,
   onEditJob,
   onOpenCreatePart,
   onGenerateInvoice,
@@ -68,10 +68,21 @@ function JobDetailPanel({
             ) : (
               jobParts.map((jobPart) => (
                 <div className="line-item-row" key={jobPart.job_part_id}>
-                  <strong>{jobPart.part_description || 'Part'}</strong>
-                  <span>
-                    Qty {jobPart.quantity} · {formatCurrency(jobPart.charge_price)}
-                  </span>
+                  <div className="line-item-copy">
+                    <strong>{jobPart.part_description || 'Part'}</strong>
+                    <span>
+                      Qty {jobPart.quantity} · {formatCurrency(jobPart.charge_price)}
+                    </span>
+                  </div>
+                  <button
+                    className="icon-button danger"
+                    disabled={busyAction === `delete-part-${jobPart.job_part_id}`}
+                    onClick={() => onDeleteJobPart(jobPart.job_part_id)}
+                    title="Remove linked part"
+                    type="button"
+                  >
+                    {busyAction === `delete-part-${jobPart.job_part_id}` ? '…' : '×'}
+                  </button>
                 </div>
               ))
             )}
@@ -102,7 +113,7 @@ function JobDetailPanel({
                 <option value="">Select a part</option>
                 {parts.map((part) => (
                   <option key={part.part_id} value={part.part_id}>
-                    {[part.part_description, part.brand].filter(Boolean).join(' · ')}
+                    {part.part_description}
                   </option>
                 ))}
                 <option value={NEW_PART_OPTION}>+ Add a new part</option>
@@ -154,8 +165,19 @@ function JobDetailPanel({
             ) : (
               jobLineItems.map((lineItem) => (
                 <div className="line-item-row" key={lineItem.line_item_id}>
-                  <strong>{lineItem.service_description || lineItem.description || 'Custom labour'}</strong>
-                  <span>{formatCurrency(lineItem.line_total)}</span>
+                  <div className="line-item-copy">
+                    <strong>{lineItem.service_description || lineItem.description || 'Custom labour'}</strong>
+                    <span>{formatCurrency(lineItem.line_total)}</span>
+                  </div>
+                  <button
+                    className="icon-button danger"
+                    disabled={busyAction === `delete-service-${lineItem.line_item_id}`}
+                    onClick={() => onDeleteJobService(lineItem.line_item_id)}
+                    title="Remove linked service"
+                    type="button"
+                  >
+                    {busyAction === `delete-service-${lineItem.line_item_id}` ? '…' : '×'}
+                  </button>
                 </div>
               ))
             )}
@@ -247,10 +269,6 @@ function JobDetailPanel({
             Edit Intake
           </button>
         </div>
-
-        {actionMessage ? <div className="feedback-banner success">{actionMessage}</div> : null}
-        {actionError ? <div className="feedback-banner error">{actionError}</div> : null}
-
         <div className="job-detail-grid">
           <div className="job-detail-stack">
             <article className="detail-block">
