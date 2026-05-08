@@ -17,7 +17,6 @@ function getPartPayload(body) {
   const errors = [];
 
   return {
-    brand: parseText(body.brand, 'brand', errors),
     errors,
     part_description: parseText(body.part_description, 'part_description', errors, {
       required: true,
@@ -74,17 +73,15 @@ router.post(
     const sql = `
       INSERT INTO Part (
         part_description,
-        brand,
         supplier_name,
         supplier_cost,
         retail_price
       )
-      VALUES (?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?)
     `;
 
     const result = await run(db, sql, [
       payload.part_description,
-      payload.brand,
       payload.supplier_name,
       payload.supplier_cost,
       payload.retail_price,
@@ -112,7 +109,6 @@ router.put(
       UPDATE Part
       SET
         part_description = ?,
-        brand = ?,
         supplier_name = ?,
         supplier_cost = ?,
         retail_price = ?
@@ -121,7 +117,6 @@ router.put(
 
     const result = await run(db, sql, [
       payload.part_description,
-      payload.brand,
       payload.supplier_name,
       payload.supplier_cost,
       payload.retail_price,

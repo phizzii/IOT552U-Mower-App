@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 
 function createInitialState(part = null) {
   return {
-    brand: part?.brand || '',
     part_description: part?.part_description || '',
     supplier_name: part?.supplier_name || '',
     supplier_cost: part?.supplier_cost || '',
@@ -156,21 +155,6 @@ function PartForm({
               {fieldErrors.supplier_name && (
                 <div className="field-error">{fieldErrors.supplier_name}</div>
               )}
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="brand">
-                Brand / Manufacturer
-              </label>
-              <input
-                className="form-input"
-                id="brand"
-                name="brand"
-                onChange={handleInputChange}
-                placeholder="e.g. Honda, NGK, Stihl"
-                type="text"
-                value={formData.brand}
-              />
             </div>
           </div>
 

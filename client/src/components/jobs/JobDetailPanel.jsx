@@ -113,7 +113,7 @@ function JobDetailPanel({
                 <option value="">Select a part</option>
                 {parts.map((part) => (
                   <option key={part.part_id} value={part.part_id}>
-                    {[part.part_description, part.brand].filter(Boolean).join(' · ')}
+                    {part.part_description}
                   </option>
                 ))}
                 <option value={NEW_PART_OPTION}>+ Add a new part</option>

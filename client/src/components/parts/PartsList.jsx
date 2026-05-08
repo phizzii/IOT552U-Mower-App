@@ -88,15 +88,11 @@ function PartsList({ onDelete, onEdit, onView, parts }) {
               onToggle={() =>
                 setOpenPartId((current) => (current === part.part_id ? null : part.part_id))
               }
-              subtitle={[part.brand, part.supplier_name].filter(Boolean).join(' · ') || 'No supplier'}
+              subtitle={part.supplier_name || 'No supplier'}
               summary={`£${retailPrice.toFixed(2)}`}
               title={part.part_description}
             >
               <div className="record-detail-grid">
-                <div className="record-detail-item">
-                  <span className="record-detail-label">Brand</span>
-                  <strong>{part.brand || 'Not set'}</strong>
-                </div>
                 <div className="record-detail-item">
                   <span className="record-detail-label">Supplier cost</span>
                   <strong>£{supplierCost.toFixed(2)}</strong>
