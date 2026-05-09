@@ -212,7 +212,9 @@ function PartForm({
                 <div className="preview-item">
                   <span className="preview-label">Margin %:</span>
                   <span className="preview-value">
-                    {(((parseFloat(formData.retail_price) - parseFloat(formData.supplier_cost)) / parseFloat(formData.supplier_cost)) * 100).toFixed(0)}%
+                    {parseFloat(formData.supplier_cost) > 0
+                      ? `${(((parseFloat(formData.retail_price) - parseFloat(formData.supplier_cost)) / parseFloat(formData.supplier_cost)) * 100).toFixed(0)}%`
+                      : 'N/A'}
                   </span>
                 </div>
               </div>

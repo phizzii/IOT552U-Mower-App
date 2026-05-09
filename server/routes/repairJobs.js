@@ -11,15 +11,13 @@ const {
   run,
   sendValidationErrors,
   validateIdParam,
+  withTransaction,
 } = require('../utils/routeHelpers');
 
 function getRepairJobPayload(body) {
   const errors = [];
 
   return {
-    assigned_mechanic: parseText(body.assigned_mechanic, 'assigned_mechanic', errors, {
-      required: true,
-    }),
     contact_method: parseText(body.contact_method, 'contact_method', errors),
     customer_id: parseInteger(body.customer_id, 'customer_id', errors, {
       min: 1,
@@ -116,12 +114,11 @@ router.post(
         instruction,
         notes,
         status,
-        assigned_mechanic,
         date_finished,
         contact_method,
         date_return
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const result = await run(db, sql, [
@@ -132,7 +129,6 @@ router.post(
       payload.instruction,
       payload.notes,
       payload.status,
-      payload.assigned_mechanic,
       payload.date_finished,
       payload.contact_method,
       payload.date_return,
@@ -166,7 +162,6 @@ router.put(
         instruction = ?,
         notes = ?,
         status = ?,
-        assigned_mechanic = ?,
         date_finished = ?,
         contact_method = ?,
         date_return = ?
@@ -181,7 +176,6 @@ router.put(
       payload.instruction,
       payload.notes,
       payload.status,
-      payload.assigned_mechanic,
       payload.date_finished,
       payload.contact_method,
       payload.date_return,
@@ -205,8 +199,19 @@ router.delete(
       return;
     }
 
-    const sql = 'DELETE FROM Repair_Job WHERE job_no = ?';
-    const result = await run(db, sql, [id]);
+    const result = await withTransaction(db, async () => {
+      const invoices = await all(db, 'SELECT invoice_no FROM Invoice WHERE job_no = ?', [id]);
+
+      for (const invoice of invoices) {
+        await run(db, 'DELETE FROM Delivery WHERE invoice_no = ?', [invoice.invoice_no]);
+        await run(db, 'DELETE FROM Invoice_Sale_Item WHERE invoice_no = ?', [invoice.invoice_no]);
+      }
+
+      await run(db, 'DELETE FROM Invoice WHERE job_no = ?', [id]);
+      await run(db, 'DELETE FROM Job_Line_Item WHERE job_id = ?', [id]);
+      await run(db, 'DELETE FROM Job_Part WHERE job_no = ?', [id]);
+      return run(db, 'DELETE FROM Repair_Job WHERE job_no = ?', [id]);
+    });
 
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Repair job not found' });

@@ -1,4 +1,9 @@
+import { useEffect } from 'react';
+import usePagination from '../../hooks/usePagination';
 import { formatDate } from '../../utils/formatters';
+import PaginationControls from '../shared/PaginationControls';
+
+const PAGE_SIZE = 10;
 
 function machineLabel(job) {
   const make = job.machine_make || 'Machine';
@@ -8,6 +13,41 @@ function machineLabel(job) {
 }
 
 function JobsTable({ jobs, onSelect, selectedJobId }) {
+  const {
+    currentPage,
+    paginatedItems,
+    range,
+    setCurrentPage,
+    totalItems,
+    totalPages,
+  } = usePagination(jobs, {
+    pageSize: PAGE_SIZE,
+  });
+
+  useEffect(() => {
+    if (!selectedJobId) {
+      return;
+    }
+
+    const selectedIndex = jobs.findIndex((job) => job.job_no === selectedJobId);
+
+    if (selectedIndex === -1) {
+      return;
+    }
+
+    const nextPage = Math.floor(selectedIndex / PAGE_SIZE) + 1;
+    setCurrentPage(nextPage);
+  }, [jobs, selectedJobId, setCurrentPage]);
+
+  function handlePageChange(page) {
+    setCurrentPage(page);
+
+    const firstJobOnPage = jobs[(page - 1) * PAGE_SIZE];
+    if (firstJobOnPage) {
+      onSelect(firstJobOnPage.job_no);
+    }
+  }
+
   return (
     <section className="surface-card jobs-table-card" data-reveal="jobs-table">
       <div className="jobs-table-header">
@@ -24,6 +64,7 @@ function JobsTable({ jobs, onSelect, selectedJobId }) {
           <span>Try widening the date range or switching back to all statuses.</span>
         </div>
       ) : (
+        <>
         <div className="jobs-table-scroll">
           <table className="jobs-table">
             <thead>
@@ -33,11 +74,10 @@ function JobsTable({ jobs, onSelect, selectedJobId }) {
                 <th>Machine</th>
                 <th>Status</th>
                 <th>Date Logged</th>
-                <th>Assigned Mechanic</th>
               </tr>
             </thead>
             <tbody>
-              {jobs.map((job) => {
+              {paginatedItems.map((job) => {
                 const isSelected = job.job_no === selectedJobId;
 
                 return (
@@ -61,13 +101,20 @@ function JobsTable({ jobs, onSelect, selectedJobId }) {
                       <span className="status-chip">{job.status || 'Unspecified'}</span>
                     </td>
                     <td>{formatDate(job.date_logged)}</td>
-                    <td>{job.assigned_mechanic || 'Unassigned'}</td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         </div>
+        <PaginationControls
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+          range={range}
+          totalItems={totalItems}
+          totalPages={totalPages}
+        />
+        </>
       )}
     </section>
   );

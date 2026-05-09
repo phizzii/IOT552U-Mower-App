@@ -1,7 +1,19 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import usePagination from '../../hooks/usePagination';
+import ExpandableRecord from '../shared/ExpandableRecord';
+import PaginationControls from '../shared/PaginationControls';
 
 function InvoicesList({ invoices, onDelete, onEdit, onView }) {
+  const [openInvoiceId, setOpenInvoiceId] = useState(null);
   const filteredInvoices = useMemo(() => invoices, [invoices]);
+  const {
+    currentPage,
+    paginatedItems,
+    range,
+    setCurrentPage,
+    totalItems,
+    totalPages,
+  } = usePagination(filteredInvoices);
 
   return (
     <div className="invoices-list-card surface-card">
@@ -23,13 +35,16 @@ function InvoicesList({ invoices, onDelete, onEdit, onView }) {
           </p>
         </div>
       ) : (
-        <div className="invoices-grid">
-          {filteredInvoices.map((invoice) => {
+        <>
+        <div className="record-list">
+          {paginatedItems.map((invoice) => {
             const customerName = invoice.customer_first_name
               ? `${invoice.customer_first_name} ${invoice.customer_last_name}`
               : 'Unknown customer';
             const reference = invoice.job_no
-              ? `Job #${invoice.job_no}`
+              ? `Job #${invoice.job_no}${invoice.sale_item_summary ? ` + ${invoice.sale_item_summary}` : ''}`
+              : invoice.sale_item_summary
+              ? invoice.sale_item_summary
               : invoice.sale_item_no
               ? `Sale item #${invoice.sale_item_no}`
               : 'No reference';
@@ -37,22 +52,9 @@ function InvoicesList({ invoices, onDelete, onEdit, onView }) {
             const datePaid = invoice.date_paid ? `Paid ${invoice.date_paid}` : 'Pending';
 
             return (
-              <article className="invoice-card" key={invoice.invoice_no}>
-                <div className="invoice-card-header">
-                  <div>
-                    <h4 className="invoice-title">Invoice #{invoice.invoice_no}</h4>
-                    <p className="invoice-name">{customerName}</p>
-                  </div>
-                  <div className="invoice-total">£{Number(invoice.total_cost).toFixed(2)}</div>
-                </div>
-
-                <div className="invoice-summary">
-                  <span>{reference}</span>
-                  <span>{paymentType}</span>
-                  <span>{datePaid}</span>
-                </div>
-
-                <div className="card-actions invoice-actions">
+              <ExpandableRecord
+                actions={
+                  <>
                   <button
                     aria-label={`View invoice ${invoice.invoice_no}`}
                     className="icon-button"
@@ -84,11 +86,45 @@ function InvoicesList({ invoices, onDelete, onEdit, onView }) {
                   >
                     ×
                   </button>
+                  </>
+                }
+                isOpen={openInvoiceId === invoice.invoice_no}
+                key={invoice.invoice_no}
+                onToggle={() =>
+                  setOpenInvoiceId((current) =>
+                    current === invoice.invoice_no ? null : invoice.invoice_no
+                  )
+                }
+                subtitle={customerName}
+                summary={`£${Number(invoice.total_cost).toFixed(2)}`}
+                title={`Invoice #${invoice.invoice_no}`}
+              >
+                <div className="record-detail-grid">
+                  <div className="record-detail-item">
+                    <span className="record-detail-label">Reference</span>
+                    <strong>{reference}</strong>
+                  </div>
+                  <div className="record-detail-item">
+                    <span className="record-detail-label">Payment type</span>
+                    <strong>{paymentType}</strong>
+                  </div>
+                  <div className="record-detail-item">
+                    <span className="record-detail-label">Status</span>
+                    <strong>{datePaid}</strong>
+                  </div>
                 </div>
-              </article>
+              </ExpandableRecord>
             );
           })}
         </div>
+        <PaginationControls
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          range={range}
+          totalItems={totalItems}
+          totalPages={totalPages}
+        />
+        </>
       )}
     </div>
   );

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import PageHeader from '../components/navigation/PageHeader';
 import InvoiceForm from '../components/invoices/InvoiceForm';
 import InvoiceDetailPage from '../components/invoices/InvoiceDetailPage';
@@ -10,13 +10,15 @@ import { fetchJson } from '../utils/api';
 function InvoicesPage() {
   const loadData = useCallback(
     async () => {
-      const [invoices, customers, jobs, saleItems] = await Promise.all([
+      const [invoices, customers, jobs, saleItems, jobParts, jobLineItems] = await Promise.all([
         fetchJson('/invoices'),
         fetchJson('/customers'),
         fetchJson('/repair-jobs'),
         fetchJson('/sale-items'),
+        fetchJson('/job-parts'),
+        fetchJson('/job-line-items'),
       ]);
-      return { customers, invoices, jobs, saleItems };
+      return { customers, invoices, jobLineItems, jobParts, jobs, saleItems };
     },
     []
   );
@@ -47,7 +49,29 @@ function InvoicesPage() {
   });
 
   const customers = data?.customers || [];
-  const jobs = data?.jobs || [];
+  const jobs = useMemo(() => {
+    const jobsData = data?.jobs || [];
+    const jobParts = data?.jobParts || [];
+    const jobLineItems = data?.jobLineItems || [];
+
+    return jobsData.map((job) => {
+      const partsTotal = jobParts
+        .filter((jobPart) => jobPart.job_no === job.job_no)
+        .reduce(
+          (sum, jobPart) =>
+            sum + Number(jobPart.charge_price || 0) * Number(jobPart.quantity || 0),
+          0
+        );
+      const servicesTotal = jobLineItems
+        .filter((lineItem) => lineItem.job_id === job.job_no)
+        .reduce((sum, lineItem) => sum + Number(lineItem.line_total || 0), 0);
+
+      return {
+        ...job,
+        suggested_total: Number((partsTotal + servicesTotal).toFixed(2)),
+      };
+    });
+  }, [data]);
   const saleItems = data?.saleItems || [];
 
   return (
@@ -58,28 +82,26 @@ function InvoicesPage() {
       {actionError ? <div className="feedback-banner error">{actionError}</div> : null}
       {actionMessage ? <div className="feedback-banner success">{actionMessage}</div> : null}
 
-      <div className="page-grid">
-        <div className="page-stack">
-          <ModuleActionCard
-            actionLabel="+ New Invoice"
-            onAction={openCreate}
-            sectionLabel="Billing"
-            title="Invoice Records"
-          />
+      <div className="page-stack page-stack--wide">
+        <ModuleActionCard
+          actionLabel="+ New Invoice"
+          onAction={openCreate}
+          sectionLabel="Billing"
+          title="Invoice Records"
+        />
 
-          {isLoading ? (
-            <div className="surface-card">
-              <div className="loading-state">Loading invoices...</div>
-            </div>
-          ) : (
-            <InvoicesList
-              invoices={invoices}
-              onDelete={deleteItem}
-              onEdit={openEdit}
-              onView={openDetail}
-            />
-          )}
-        </div>
+        {isLoading ? (
+          <div className="surface-card">
+            <div className="loading-state">Loading invoices...</div>
+          </div>
+        ) : (
+          <InvoicesList
+            invoices={invoices}
+            onDelete={deleteItem}
+            onEdit={openEdit}
+            onView={openDetail}
+          />
+        )}
       </div>
 
       <InvoiceForm

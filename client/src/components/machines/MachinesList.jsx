@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react';
+import usePagination from '../../hooks/usePagination';
+import ExpandableRecord from '../shared/ExpandableRecord';
+import PaginationControls from '../shared/PaginationControls';
 
 function MachinesList({
-  customers,
   machineTypes,
   machines,
   onDelete,
   onEdit,
   onView,
 }) {
+  const [openMachineId, setOpenMachineId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [machineTypeFilter, setMachineTypeFilter] = useState('');
 
@@ -37,6 +40,16 @@ function MachinesList({
 
     return filtered;
   }, [machines, searchTerm, machineTypeFilter]);
+  const {
+    currentPage,
+    paginatedItems,
+    range,
+    setCurrentPage,
+    totalItems,
+    totalPages,
+  } = usePagination(filteredMachines, {
+    resetKeys: [searchTerm, machineTypeFilter],
+  });
 
   return (
     <section className="surface-card machines-list-card" data-reveal="machines-list">
@@ -88,17 +101,12 @@ function MachinesList({
           </span>
         </div>
       ) : (
-        <div className="machines-grid">
-          {filteredMachines.map((machine) => (
-            <div className="machine-card" key={machine.machine_id}>
-              <div className="card-header">
-                <div className="machine-info">
-                  <div className="machine-name">
-                    {machine.make} {machine.model_no}
-                  </div>
-                  <div className="machine-type">{machine.machine_type_name}</div>
-                </div>
-                <div className="card-actions">
+        <>
+        <div className="record-list">
+          {paginatedItems.map((machine) => (
+            <ExpandableRecord
+              actions={
+                <>
                   <button
                     aria-label={`View ${machine.make} ${machine.model_no}`}
                     className="icon-button"
@@ -130,34 +138,46 @@ function MachinesList({
                   >
                     ×
                   </button>
-                </div>
-              </div>
-
-              <div className="card-body">
-                <div className="owner-info">
-                  <span className="label">Owner</span>
-                  <span className="value">
+                </>
+              }
+              isOpen={openMachineId === machine.machine_id}
+              key={machine.machine_id}
+              onToggle={() =>
+                setOpenMachineId((current) =>
+                  current === machine.machine_id ? null : machine.machine_id
+                )
+              }
+              subtitle={machine.machine_type_name || 'No type'}
+              summary={`${machine.customer_first_name} ${machine.customer_last_name}`}
+              title={`${machine.make} ${machine.model_no}`}
+            >
+              <div className="record-detail-grid">
+                <div className="record-detail-item">
+                  <span className="record-detail-label">Owner</span>
+                  <strong>
                     {machine.customer_first_name} {machine.customer_last_name}
-                  </span>
+                  </strong>
                 </div>
-
-                {machine.serial_no && (
-                  <div className="serial-info">
-                    <span className="label">Serial</span>
-                    <span className="value">{machine.serial_no}</span>
-                  </div>
-                )}
-
-                {machine.other_no && (
-                  <div className="other-info">
-                    <span className="label">Other ID</span>
-                    <span className="value">{machine.other_no}</span>
-                  </div>
-                )}
+                <div className="record-detail-item">
+                  <span className="record-detail-label">Serial</span>
+                  <strong>{machine.serial_no || 'Not set'}</strong>
+                </div>
+                <div className="record-detail-item record-detail-item--wide">
+                  <span className="record-detail-label">Other ID</span>
+                  <strong>{machine.other_no || 'Not set'}</strong>
+                </div>
               </div>
-            </div>
+            </ExpandableRecord>
           ))}
         </div>
+        <PaginationControls
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          range={range}
+          totalItems={totalItems}
+          totalPages={totalPages}
+        />
+        </>
       )}
     </section>
   );

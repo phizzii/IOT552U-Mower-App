@@ -10,6 +10,7 @@ import JobsFilterBar from '../components/jobs/JobsFilterBar';
 import JobsTable from '../components/jobs/JobsTable';
 import JobWizard from '../components/jobs/JobWizard';
 import PageHeader from '../components/navigation/PageHeader';
+import PartForm from '../components/parts/PartForm';
 import { fetchJson } from '../utils/api';
 
 const emptyWorkspace = {
@@ -83,7 +84,6 @@ function calculateTotals(jobLineItems, jobParts) {
 
 function buildRepairJobPayload(job) {
   return {
-    assigned_mechanic: job.assigned_mechanic || '',
     contact_method: job.contact_method || '',
     customer_id: job.customer_id,
     date_collected: job.date_collected || '',
@@ -105,8 +105,11 @@ function JobsPage() {
   const [filters, setFilters] = useState(initialFilters);
   const [invoiceDraft, setInvoiceDraft] = useState(initialInvoiceDraft);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPartFormOpen, setIsPartFormOpen] = useState(false);
+  const [isPartFormSubmitting, setIsPartFormSubmitting] = useState(false);
   const [isWizardSubmitting, setIsWizardSubmitting] = useState(false);
   const [partDraft, setPartDraft] = useState(initialPartDraft);
+  const [partFormError, setPartFormError] = useState('');
   const [selectedJobId, setSelectedJobId] = useState(null);
   const [serviceDraft, setServiceDraft] = useState(initialServiceDraft);
   const [statusDraft, setStatusDraft] = useState('Logged');
@@ -287,6 +290,16 @@ function JobsPage() {
     }));
   }
 
+  function openCreatePartForm() {
+    setPartFormError('');
+    setIsPartFormOpen(true);
+  }
+
+  function closeCreatePartForm() {
+    setIsPartFormOpen(false);
+    setPartFormError('');
+  }
+
   async function handleJobWizardSubmit(formState) {
     setIsWizardSubmitting(true);
     setActionError('');
@@ -313,7 +326,6 @@ function JobsPage() {
       }
 
       const repairJobPayload = {
-        assigned_mechanic: formState.assigned_mechanic,
         contact_method: formState.contact_method,
         customer_id: Number(formState.customer_id),
         date_collected: formState.date_collected,
@@ -422,6 +434,49 @@ function JobsPage() {
     }
   }
 
+  async function handleCreatePart(partData) {
+    setIsPartFormSubmitting(true);
+    setActionError('');
+    setPartFormError('');
+
+    try {
+      const result = await fetchJson('/parts', {
+        body: JSON.stringify(partData),
+        method: 'POST',
+      });
+
+      if (selectedJob) {
+        await fetchJson('/job-parts', {
+          body: JSON.stringify({
+            bill_date: partDraft.bill_date,
+            bill_no: partDraft.bill_no,
+            charge_price: toNumber(partDraft.charge_price) ?? Number(partData.retail_price || 0),
+            job_no: selectedJob.job_no,
+            part_id: result.part_id,
+            quantity: Number(partDraft.quantity || 1),
+          }),
+          method: 'POST',
+        });
+      }
+
+      closeCreatePartForm();
+      setActionMessage(
+        selectedJob
+          ? 'Part created and linked to the repair job successfully.'
+          : 'Part created successfully.'
+      );
+      setPartDraft((current) => ({
+        ...initialPartDraft,
+        bill_date: current.bill_date || initialPartDraft.bill_date,
+      }));
+      await loadWorkspace(selectedJob?.job_no);
+    } catch (partError) {
+      setPartFormError(partError.message || 'The part could not be created.');
+    } finally {
+      setIsPartFormSubmitting(false);
+    }
+  }
+
   async function handleAddService() {
     if (!selectedJob) {
       return;
@@ -486,10 +541,63 @@ function JobsPage() {
         }),
         method: 'POST',
       });
-      setActionMessage('Invoice generated successfully.');
+
+      await fetchJson(`/repair-jobs/${selectedJob.job_no}`, {
+        body: JSON.stringify(
+          buildRepairJobPayload({
+            ...selectedJob,
+            status: 'Collected',
+          })
+        ),
+        method: 'PUT',
+      });
+
+      setActionMessage('Invoice generated successfully and the job was marked as collected.');
       await loadWorkspace(selectedJob.job_no);
     } catch (invoiceError) {
       setActionError(invoiceError.message || 'The invoice could not be created.');
+    } finally {
+      setBusyAction('');
+    }
+  }
+
+  async function handleDeleteJobPart(jobPartId) {
+    if (!selectedJob) {
+      return;
+    }
+
+    setBusyAction(`delete-part-${jobPartId}`);
+    setActionError('');
+
+    try {
+      await fetchJson(`/job-parts/${jobPartId}`, {
+        method: 'DELETE',
+      });
+      setActionMessage('Linked part removed from the repair job successfully.');
+      await loadWorkspace(selectedJob.job_no);
+    } catch (deleteError) {
+      setActionError(deleteError.message || 'The linked part could not be removed.');
+    } finally {
+      setBusyAction('');
+    }
+  }
+
+  async function handleDeleteJobService(lineItemId) {
+    if (!selectedJob) {
+      return;
+    }
+
+    setBusyAction(`delete-service-${lineItemId}`);
+    setActionError('');
+
+    try {
+      await fetchJson(`/job-line-items/${lineItemId}`, {
+        method: 'DELETE',
+      });
+      setActionMessage('Linked service removed from the repair job successfully.');
+      await loadWorkspace(selectedJob.job_no);
+    } catch (deleteError) {
+      setActionError(deleteError.message || 'The linked service could not be removed.');
     } finally {
       setBusyAction('');
     }
@@ -521,6 +629,9 @@ function JobsPage() {
     <div className="jobs-page">
       <PageHeader eyebrow="Core Workflow" title="Jobs" />
 
+      {actionError ? <div className="feedback-banner error">{actionError}</div> : null}
+      {actionMessage ? <div className="feedback-banner success">{actionMessage}</div> : null}
+
       <div className="jobs-workspace">
         <div className="jobs-primary-column">
           <JobsFilterBar
@@ -544,8 +655,6 @@ function JobsPage() {
         </div>
 
         <JobDetailPanel
-          actionError={actionError}
-          actionMessage={actionMessage}
           busyAction={busyAction}
           customer={selectedCustomer}
           invoiceDraft={invoiceDraft}
@@ -556,7 +665,10 @@ function JobsPage() {
           machine={selectedMachine}
           onAddPart={handleAddPart}
           onAddService={handleAddService}
+          onDeleteJobPart={handleDeleteJobPart}
+          onDeleteJobService={handleDeleteJobService}
           onEditJob={() => openWizard('edit', selectedJob)}
+          onOpenCreatePart={openCreatePartForm}
           onGenerateInvoice={handleGenerateInvoice}
           onInvoiceDraftChange={(field, value) =>
             setInvoiceDraft((current) => ({
@@ -597,6 +709,16 @@ function JobsPage() {
         mode={wizardState.mode}
         onClose={closeWizard}
         onSubmit={handleJobWizardSubmit}
+      />
+
+      <PartForm
+        error={partFormError}
+        isOpen={isPartFormOpen}
+        isSubmitting={isPartFormSubmitting}
+        mode="create"
+        onClose={closeCreatePartForm}
+        onSubmit={handleCreatePart}
+        part={null}
       />
     </div>
   );

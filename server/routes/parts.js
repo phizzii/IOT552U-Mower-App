@@ -10,6 +10,7 @@ const {
   run,
   sendValidationErrors,
   validateIdParam,
+  withTransaction,
 } = require('../utils/routeHelpers');
 
 function getPartPayload(body) {
@@ -139,8 +140,10 @@ router.delete(
       return;
     }
 
-    const sql = 'DELETE FROM Part WHERE part_id = ?';
-    const result = await run(db, sql, [id]);
+    const result = await withTransaction(db, async () => {
+      await run(db, 'DELETE FROM Job_Part WHERE part_id = ?', [id]);
+      return run(db, 'DELETE FROM Part WHERE part_id = ?', [id]);
+    });
 
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Part not found' });

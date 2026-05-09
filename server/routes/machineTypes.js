@@ -4,6 +4,7 @@ const db = require('../db/db');
 const {
   all,
   asyncHandler,
+  findBlockingReference,
   getOne,
   normalizeText,
   run,
@@ -104,6 +105,15 @@ router.delete(
 
     if (sendValidationErrors(res, errors)) {
       return;
+    }
+
+    const blockingReference = await findBlockingReference(db, id, [
+      { column: 'machine_type_id', message: 'Remove linked machines before deleting this machine type.', table: 'Machine' },
+      { column: 'machine_type_id', message: 'Remove linked services before deleting this machine type.', table: 'Service' },
+    ]);
+
+    if (blockingReference) {
+      return res.status(409).json({ error: blockingReference.message });
     }
 
     const sql = 'DELETE FROM Machine_Type WHERE machine_type_id = ?';

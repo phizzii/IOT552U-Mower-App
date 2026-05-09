@@ -1,55 +1,115 @@
+import { useMemo, useState } from 'react';
 import DashboardSection from './DashboardSection';
-import { formatCurrency } from '../../utils/formatters';
-
-function OperationalEfficiencyCard({ repairTime, mechanicsPerformance, labourMetrics }) {
+import { formatCurrency, formatShortDate } from '../../utils/formatters';
+ 
+function OperationalEfficiencyCard({ labourMetrics, repairTime, jobBreakdown = [] }) {
+  const [sortBy, setSortBy] = useState('repairDays');
+ 
+  const sortedJobs = useMemo(() => {
+    const jobs = [...jobBreakdown];
+ 
+    return jobs.sort((left, right) => {
+      if (sortBy === 'labourCost') {
+        return Number(right.labourCost || 0) - Number(left.labourCost || 0);
+      }
+ 
+      if (sortBy === 'labourHours') {
+        return Number(right.labourHours || 0) - Number(left.labourHours || 0);
+      }
+ 
+      return Number(right.repairDays || 0) - Number(left.repairDays || 0);
+    });
+  }, [jobBreakdown, sortBy]);
+ 
   return (
-    <DashboardSection eyebrow="Productivity" title="Operational efficiency">
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-        <div className="dashboard-kpi-card tone-forest">
-          <span className="dashboard-kpi-label">Avg repair time</span>
-          <strong className="dashboard-kpi-value">
+<DashboardSection eyebrow="Productivity" title="Operational Efficiency">
+<div className="report-kpi-strip report-kpi-strip--two-up">
+<div className="report-kpi-tile">
+<span className="report-kpi-label">Average Repair Time</span>
+<strong className="report-kpi-value">
             {repairTime.avgDays ? `${repairTime.avgDays} days` : '—'}
-          </strong>
-          <p className="dashboard-kpi-detail">
+</strong>
+<span className="report-kpi-meta">
             {repairTime.completedJobs} of {repairTime.totalJobs} completed
-          </p>
-        </div>
-
-        <div className="dashboard-kpi-card tone-forest">
-          <span className="dashboard-kpi-label">Avg labour cost</span>
-          <strong className="dashboard-kpi-value">
+</span>
+</div>
+ 
+        <div className="report-kpi-tile">
+<span className="report-kpi-label">Average Labour Cost</span>
+<strong className="report-kpi-value">
             {labourMetrics.avgCost ? formatCurrency(labourMetrics.avgCost) : '—'}
-          </strong>
-          <p className="dashboard-kpi-detail">{labourMetrics.avgHours} hours per job</p>
-        </div>
-      </div>
-
-      <div>
-        <h4 style={{ fontSize: '0.95rem', marginBottom: '12px', color: 'var(--ink-soft)' }}>
-          Mechanic performance
-        </h4>
-        <div className="dashboard-status-list">
-          {mechanicsPerformance.map((mechanic) => (
-            <div className="dashboard-status-row" key={mechanic.mechanic}>
-              <div className="dashboard-status-copy">
-                <strong>{mechanic.mechanic}</strong>
-                <span>{mechanic.totalJobs} total • {mechanic.completedJobs} completed</span>
-              </div>
-              <div>
-                <span style={{ color: 'var(--accent)', fontWeight: '600' }}>
-                  {mechanic.completionRate}%
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {mechanicsPerformance.length === 0 && (
-        <p style={{ color: 'var(--ink-soft)', fontSize: '0.9rem' }}>No mechanic data available</p>
-      )}
-    </DashboardSection>
+</strong>
+<span className="report-kpi-meta">
+            {labourMetrics.avgHours || 0} hours per job
+</span>
+</div>
+</div>
+ 
+      <div className="report-chart-block">
+<div className="report-chart-heading">
+<strong>Completed job breakdown</strong>
+<span>Compare turnaround time and labour effort across completed repairs</span>
+</div>
+ 
+        <div className="toggle-row">
+<button
+            className={`toggle-chip ${sortBy === 'repairDays' ? 'is-active' : ''}`}
+            onClick={() => setSortBy('repairDays')}
+            type="button"
+>
+            Sort by repair days
+</button>
+<button
+            className={`toggle-chip ${sortBy === 'labourHours' ? 'is-active' : ''}`}
+            onClick={() => setSortBy('labourHours')}
+            type="button"
+>
+            Sort by labour hours
+</button>
+<button
+            className={`toggle-chip ${sortBy === 'labourCost' ? 'is-active' : ''}`}
+            onClick={() => setSortBy('labourCost')}
+            type="button"
+>
+            Sort by labour cost
+</button>
+</div>
+ 
+        {sortedJobs.length === 0 ? (
+<div className="report-empty-state">No completed job data available</div>
+        ) : (
+<div className="report-table-wrap">
+<table className="report-table">
+<thead>
+<tr>
+<th>Job</th>
+<th>Machine Type</th>
+<th>Logged</th>
+<th>Finished</th>
+<th>Repair Days</th>
+<th>Labour Hours</th>
+<th>Labour Cost</th>
+</tr>
+</thead>
+<tbody>
+                {sortedJobs.map((job) => (
+<tr key={job.jobNo}>
+<td>#{job.jobNo}</td>
+<td>{job.machineType || '—'}</td>
+<td>{formatShortDate(job.dateLogged, '—')}</td>
+<td>{formatShortDate(job.dateFinished, '—')}</td>
+<td>{job.repairDays ?? '—'}</td>
+<td>{job.labourHours ?? 0}</td>
+<td>{formatCurrency(job.labourCost || 0)}</td>
+</tr>
+                ))}
+</tbody>
+</table>
+</div>
+        )}
+</div>
+</DashboardSection>
   );
 }
-
+ 
 export default OperationalEfficiencyCard;

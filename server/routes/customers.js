@@ -9,6 +9,7 @@ const {
   run,
   sendValidationErrors,
   validateIdParam,
+  withTransaction,
 } = require('../utils/routeHelpers');
 
 function getCustomerPayload(body) {
@@ -151,8 +152,29 @@ router.delete(
       return;
     }
 
-    const sql = 'DELETE FROM Customer WHERE customer_id = ?';
-    const result = await run(db, sql, [id]);
+    const result = await withTransaction(db, async () => {
+      const jobs = await all(db, 'SELECT job_no FROM Repair_Job WHERE customer_id = ?', [id]);
+      const jobIds = jobs.map((job) => job.job_no);
+      const invoices = await all(db, 'SELECT invoice_no FROM Invoice WHERE customer_id = ?', [id]);
+      const invoiceIds = invoices.map((invoice) => invoice.invoice_no);
+
+      for (const invoiceId of invoiceIds) {
+        await run(db, 'DELETE FROM Delivery WHERE invoice_no = ?', [invoiceId]);
+      }
+
+      await run(db, 'DELETE FROM Invoice WHERE customer_id = ?', [id]);
+
+      for (const jobId of jobIds) {
+        await run(db, 'DELETE FROM Job_Line_Item WHERE job_id = ?', [jobId]);
+        await run(db, 'DELETE FROM Job_Part WHERE job_no = ?', [jobId]);
+      }
+
+      await run(db, 'DELETE FROM Repair_Job WHERE customer_id = ?', [id]);
+      await run(db, 'DELETE FROM Sale_Item WHERE customer_id = ?', [id]);
+      await run(db, 'DELETE FROM Machine WHERE customer_id = ?', [id]);
+
+      return run(db, 'DELETE FROM Customer WHERE customer_id = ?', [id]);
+    });
 
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Customer not found' });

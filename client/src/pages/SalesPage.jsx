@@ -1,23 +1,21 @@
 import { useCallback } from 'react';
 import PageHeader from '../components/navigation/PageHeader';
-import ServicesList from '../components/services/ServicesList';
-import ServiceForm from '../components/services/ServiceForm';
-import ServiceDetailPage from '../components/services/ServiceDetailPage';
+import SaleItemDetailPage from '../components/sales/SaleItemDetailPage';
+import SaleItemForm from '../components/sales/SaleItemForm';
+import SalesList from '../components/sales/SalesList';
 import ModuleActionCard from '../components/shared/ModuleActionCard';
 import useCrudPage from '../hooks/useCrudPage';
 import { fetchJson } from '../utils/api';
 
-function ServicesPage() {
-  const loadData = useCallback(
-    async () => {
-      const [services, machineTypes] = await Promise.all([
-        fetchJson('/services'),
-        fetchJson('/machine-types'),
-      ]);
-      return { machineTypes, services };
-    },
-    []
-  );
+function SalesPage() {
+  const loadData = useCallback(async () => {
+    const [customers, saleItems] = await Promise.all([
+      fetchJson('/customers'),
+      fetchJson('/sale-items'),
+    ]);
+
+    return { customers, saleItems };
+  }, []);
 
   const {
     actionError,
@@ -25,30 +23,30 @@ function ServicesPage() {
     closeDetail,
     closeForm,
     data,
+    deleteItem,
     detailState,
     error,
     formState,
     isLoading,
-    items: services,
+    items: saleItems,
     openCreate,
     openDetail,
     openEdit,
     submitForm,
-    deleteItem,
   } = useCrudPage({
-    basePath: '/services',
-    getItems: (nextData) => nextData.services,
-    itemIdKey: 'service_id',
-    itemLabel: 'Service',
+    basePath: '/sale-items',
+    getItems: (nextData) => nextData.saleItems,
+    itemIdKey: 'sale_item_no',
+    itemLabel: 'Sale item',
     loadData,
-    loadErrorMessage: 'Services could not be loaded.',
+    loadErrorMessage: 'Sale items could not be loaded.',
   });
 
-  const machineTypes = data?.machineTypes || [];
+  const customers = data?.customers || [];
 
   return (
     <div className="page-wrapper">
-      <PageHeader eyebrow="Services & Pricing" title="Services & Pricing" />
+      <PageHeader eyebrow="Sales & Stock" title="Sales" />
 
       {error ? <div className="feedback-banner error">{error}</div> : null}
       {actionError ? <div className="feedback-banner error">{actionError}</div> : null}
@@ -56,46 +54,46 @@ function ServicesPage() {
 
       <div className="page-stack page-stack--wide">
         <ModuleActionCard
-          actionLabel="+ New Service"
+          actionLabel="+ New Sale Item"
           onAction={openCreate}
-          sectionLabel="Services"
-          title="Service Records"
+          sectionLabel="Sales"
+          title="Sale Item Records"
         />
 
         {isLoading ? (
           <div className="surface-card">
-            <div className="loading-state">Loading services...</div>
+            <div className="loading-state">Loading sale items...</div>
           </div>
         ) : (
-          <ServicesList
-            services={services}
+          <SalesList
             onDelete={deleteItem}
             onEdit={openEdit}
             onView={openDetail}
+            saleItems={saleItems}
           />
         )}
       </div>
 
-      <ServiceForm
+      <SaleItemForm
+        customers={customers}
         error={actionError}
         isOpen={formState.isOpen}
         isSubmitting={formState.isSubmitting}
-        machineTypes={machineTypes}
         mode={formState.mode}
         onClose={closeForm}
         onSubmit={submitForm}
-        service={formState.item}
+        saleItem={formState.item}
       />
 
-      {detailState.isOpen && (
-        <ServiceDetailPage
-          serviceId={detailState.itemId}
+      {detailState.isOpen ? (
+        <SaleItemDetailPage
           onClose={closeDetail}
           onEdit={openEdit}
+          saleItemId={detailState.itemId}
         />
-      )}
+      ) : null}
     </div>
   );
 }
 
-export default ServicesPage;
+export default SalesPage;

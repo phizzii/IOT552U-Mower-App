@@ -4,6 +4,7 @@ const db = require('../db/db');
 const {
   all,
   asyncHandler,
+  findBlockingReference,
   getOne,
   parseDate,
   parseInteger,
@@ -176,6 +177,18 @@ router.delete(
 
     if (sendValidationErrors(res, errors)) {
       return;
+    }
+
+    const blockingReference = await findBlockingReference(db, id, [
+      {
+        column: 'sale_item_no',
+        message: 'Remove linked invoices before deleting this sale item.',
+        table: 'Invoice',
+      },
+    ]);
+
+    if (blockingReference) {
+      return res.status(409).json({ error: blockingReference.message });
     }
 
     const sql = 'DELETE FROM Sale_Item WHERE sale_item_no = ?';
