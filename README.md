@@ -62,7 +62,7 @@ The project develops a prototype relational data solution for a small machine re
 - deliveries
 - reporting and dashboard analytics
 
-This project combines a **SQLite relational database**, an Express / Node.js API, and a React frontend to demonstrate both database implementation and the business intelligence value of connected operational data.
+This project combines a SQLite relational database, an Express / Node.js API, and a React frontend to demonstrate both database implementation and the business intelligence value of connected operational data.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -209,6 +209,170 @@ API_TEST_CHECKLIST.md
 README.md
 ```
 
+<!-- GETTING STARTED -->
+## Getting Started
+
+### Prerequisites
+<p>Make sure you have installed the following: </p>
+
+- Node.js (recommended: LTS version) >>> [install here!!!](https://nodejs.org/en/download)
+- npm (comes with Node.js)
+- Git
+- Code Editor (e.g., Visual Studio Code)
+
+**psssst** you may also find useful:
+
+- DB Browser for SQLite >>> [install here!!!](https://sqlitebrowser.org/dl/)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Installation and Setup
+
+### 1. Clone repo
+```text
+git clone https://github.com/phizzii/IOT552U-Mower-App.git
+cd IOT552U-Mower-App
+```
+
+### 2. Install root dependencies
+```text
+npm install
+```
+
+### 3. Install server dependencies
+```text
+cd server
+npm install
+```
+
+### 4. Install client dependencies
+```text
+cd ../client
+npm install
+```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Database Setup
+The project uses SQLite for local development and includes seeded sample data for demonstration
+
+### 1. Move to server folder
+```text
+cd server
+```
+
+### 2. Run the seed process
+```text
+npm run seed
+```
+This will create/populate the local SQLite database with sample records aligned to the schema!
+
+#### Sample data includes:
+- customers
+- machine types
+- parts
+- machines
+- repair jobs
+- job line items
+- job parts
+- sale items
+- invoices
+- deliveries
+
+Note that sample data is *synthetic* for **project demonstration and testing purposes only**
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Running the Application
+(the fun bit)
+
+You need to run the backend and frontend separately
+
+### 1. Start the backend server
+From the *server* folder:
+```text
+npm index.js
+```
+
+The backend should run on:
+```text
+https://localhost:3001
+```
+
+### 2. Start React frontend
+Open a **new terminal (super important), then:
+```text
+cd client
+npm start
+```
+
+The frontend should run on:
+```text
+https://localhost:3000
+```
+
+The frontend communciates with the Express API and SQLite database locally.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Core Features
+- Customer management
+- Machine registration and lookup
+- Repair job tracking
+- Job parts and job line items
+- Parts and services management
+- Invoice management
+- Sale item management
+- Delivery management
+- Dashboard and reporting views
+- Logistics and customer value analysis
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Reporting and Analytics
+The reporting layer is designed to demonstrate the business intelligence value of the relational database.
+
+### Examples of reporting areas include:
+- Job status analysis – monitor incomplete work and backlog
+- Revenue analysis – review revenue over time and top service lines
+- Operational efficiency – examine repair turnaround and labour usage
+- Logistics analysis – compare delivery cost and distance patterns
+- Customer lifetime value – identify high-value repeat customers
+- These views are intended to support data-driven decision-making within the context of a small business workshop.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Manual API Testing
+Representative API testing can be carried out locally against the backend routes.
+
+### Examples include:
+```text
+curl http://localhost:3001/api/customers
+curl http://localhost:3001/api/analytics/job-status
+curl http://localhost:3001/api/analytics/revenue
+```
+
+A route checklist and sample payloads are included in:
+```text
+API_TEST_CHECKLIST.md
+```
+
+Additional manual validation can be performed using curl, Postman, Thunder Client or the browser where appropriate.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Roadmap / Future Improvements
+### Potential future improvements include:
+- authentication and authorisation
+- improved legacy Excel import pipeline
+- stronger deployment pipeline
+- PostgreSQL migration for hosted use
+- fuller stock / inventory control
+- customer portal or staff portal
+- automated testing
+- cloud deployment of the reporting dashboard
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 <!-- LICENSE -->
 ## License
 
@@ -221,9 +385,9 @@ MIT license for learning :)!
 
 Sophie - [@VolarPhizzie](https://x.com/VolarPhizzie)
 
-Project Link: [https://github.com/phizzii/IOT552U-Mower-App](https://github.com/phizzii/IOT552U-Mower-App)
+Project Link - [https://github.com/phizzii/IOT552U-Mower-App](https://github.com/phizzii/IOT552U-Mower-App)
 
-LinkedIn: [Add me here!!](https://www.linkedin.com/in/sophie-botten-82a91227a/)
+LinkedIn - [Add me here!!](https://www.linkedin.com/in/sophie-botten-82a91227a/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
