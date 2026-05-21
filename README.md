@@ -51,7 +51,7 @@
 
 This repository contains a university assignment project based on an authentic small business scenario.
 
-The project develops a prototype relational data solution for a small machine repair and sales business. The solution is designed to replace fragmented spreadsheet- and note-based processes with a more structured system for managing:
+The project develops a prototype relational data solution for a small machine repair and sales business. The solution is designed to replace fragmented spreadsheet and note-based processes with a more structured system for managing:
 
 - customers
 - customer-owned machines
@@ -299,7 +299,7 @@ https://localhost:3001
 ```
 
 ### 2. Start React frontend
-Open a **new terminal (super important), then:
+Open a **new** terminal (super important), then:
 ```text
 cd client
 npm start
